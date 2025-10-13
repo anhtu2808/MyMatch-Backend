@@ -40,7 +40,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseResponse createCourse(CourseCreationRequest req) {
         University university = universityRepository.findById(req.getUniversityId())
-                .orElseThrow(() -> new AppException(ErrorCode.UNIVERSITY_NOT_FOUND));
+                                                    .orElseThrow(() -> new AppException(ErrorCode.UNIVERSITY_NOT_FOUND));
 
         boolean isExisted = courseRepository.existsByCodeAndUniversity(req.getCode(), university);
         if (isExisted) {
@@ -55,7 +55,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseResponse getById(Long id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+                                        .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         return courseMapper.toCourseResponse(course);
     }
 
@@ -63,16 +63,17 @@ public class CourseServiceImpl implements CourseService {
     public CourseResponse updateCourse(Long id, CourseUpdateRequest request) {
 
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+                                        .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
         courseMapper.update(course, request);
+        course = courseRepository.save(course);
         return courseMapper.toCourseResponse(course);
     }
 
     @Override
     public void deleteCourse(Long id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+                                        .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         courseRepository.delete(course);
     }
 
