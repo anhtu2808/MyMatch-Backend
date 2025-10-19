@@ -18,6 +18,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface MaterialMapper {
 
     @Mapping(target = "items", ignore = true)
+    @Mapping(target = "price", source = "request.price")
     Material toMaterial(MaterialCreationRequest request);
 
     void updateMaterial(@MappingTarget Material material, MaterialUpdateRequest request);

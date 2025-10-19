@@ -32,7 +32,7 @@ public class MaterialController {
 
     @PostMapping
     public ApiResponse<MaterialResponse> createMaterial(
-            @ModelAttribute MaterialCreationRequest request) throws Exception {
+            @ModelAttribute @Valid MaterialCreationRequest request) throws Exception {
         return ApiResponse.<MaterialResponse>builder()
                 .result(materialService.createMaterial(request))
                 .build();
@@ -48,7 +48,7 @@ public class MaterialController {
     @PutMapping("/{id}")
     public ApiResponse<MaterialResponse> updateMaterial(
             @PathVariable Long id,
-            @RequestBody MaterialUpdateRequest request) {
+            @RequestBody @Valid MaterialUpdateRequest request) {
         return ApiResponse.<MaterialResponse>builder()
                 .result(materialService.updateMaterial(id, request))
                 .build();

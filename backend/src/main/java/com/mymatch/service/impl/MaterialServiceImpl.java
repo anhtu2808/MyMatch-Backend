@@ -45,10 +45,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MaterialServiceImpl implements MaterialService {
-    Long COIN_PER_MATERIAL = 5L;
+
     MaterialRepository materialRepository;
     MaterialPurchaseRepository materialPurchaseRepository;
-    FileManagerService fileManagerService;
     WalletService walletService;
     TransactionService transactionService;
     MaterialMapper materialMapper;
@@ -77,7 +76,6 @@ public class MaterialServiceImpl implements MaterialService {
                                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         material.setOwner(owner);
 
-        material.setPrice(COIN_PER_MATERIAL);
         material = materialRepository.save(material);
         List<MaterialItem> materialItems = materialItemRepository.findAllByIdInAndMaterialIsNull(request.getMaterialItemIds());
         if (materialItems.isEmpty()) {
@@ -145,9 +143,9 @@ public class MaterialServiceImpl implements MaterialService {
         }
         boolean alreadyPurchased = materialPurchaseRepository
                 .existsByMaterial_IdAndAndBuyer_Id(materialId, currentUserId);
-//        if (alreadyPurchased) {
-//            throw new AppException(ErrorCode.MATERIAL_ALREADY_PURCHASED);
-//        }
+        if (alreadyPurchased) {
+            throw new AppException(ErrorCode.MATERIAL_ALREADY_PURCHASED);
+        }
         Transaction deductTransaction = null;
         Transaction rewardTransaction = null;
         try {
@@ -163,7 +161,7 @@ public class MaterialServiceImpl implements MaterialService {
                     .type(TransactionType.IN)
                     .userId(material.getOwner().getId())
                     .source(TransactionSource.REWARD)
-                    .coin(material.getPrice() * 90 / 100) // Owner gets 90% of the price
+                    .coin(material.getPrice() * 80 / 100) // Owner gets 80% of the price
                     .description("Sale of material: " + material.getName())
                     .build();
             deductTransaction = walletService.deductFromWallet(deductRequest);
@@ -250,17 +248,6 @@ public class MaterialServiceImpl implements MaterialService {
         materialRepository.delete(material);
     }
 
-    private String buildFilePath(Long userId, String prefix) {
-
-        return userId.toString() + "/" + prefix;
-    }
-
-    private Double getFileSizeInMB(MultipartFile file) throws Exception {
-        if (file == null || file.isEmpty()) {
-            throw new Exception("File is empty");
-        }
-        return file.getSize() / (1024.0 * 1024.0);
-    }
 
 
 }
