@@ -74,25 +74,32 @@ public class ConversationServiceImpl implements ConversationService {
         String participantHash = generateParticipantHash(participantIds);
 
         // Check existing
-        conversationRepository.findByParticipantsHash(participantHash)
-                .ifPresent(c -> { throw new AppException(ErrorCode.CONVERSATION_ALREADY_EXISTS); });
+//        Conversation existing = conversationRepository.findByParticipantsHash(participantHash)
+//                .ifPresent(c -> { throw new AppException(ErrorCode.CONVERSATION_ALREADY_EXISTS); });
 
-        List<Student> participants = List.of(
-                me,
-                otherStudent
-        );
+        Conversation existed = conversationRepository.findByParticipantsHash(participantHash).
+                orElse(null);
+        Conversation conversation = new Conversation();
+        if (existed == null) {
+            List<Student> participants = List.of(
+                    me,
+                    otherStudent
+            );
 
-        // Build Conversation info
-        Conversation newConversation = Conversation.builder()
-                .type(request.getType())
-                .participants(participants)
-                .participantsHash(participantHash)
-                .avatarUrl(null)
-                .title(null)
-                .createdBy(me)
-                .build();
+            // Build Conversation info
+            Conversation newConversation = Conversation.builder()
+                    .type(request.getType())
+                    .participants(participants)
+                    .participantsHash(participantHash)
+                    .avatarUrl(null)
+                    .title(null)
+                    .createdBy(me)
+                    .build();
 
-        Conversation conversation = conversationRepository.save(newConversation);
+            conversation = conversationRepository.save(newConversation);
+        }else {
+            conversation = existed;
+        }
         ConversationResponse conversationResponse = toConversationResponse(conversation);
         conversationResponse.setConversationAvatar(otherStudent.getUser().getAvatarUrl());
         conversationResponse.setConversationName(otherStudent.getUser().getUsername());
