@@ -46,6 +46,8 @@ public enum ErrorCode {
     UNIVERSITY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Không tìm thấy trường đại học", HttpStatus.NOT_FOUND),
     LECTURER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Không tìm thấy giảng viên", HttpStatus.NOT_FOUND),
     CAMPUS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Không tìm thấy cơ sở", HttpStatus.NOT_FOUND),
+
+     BANNER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Không tìm thấy banner", HttpStatus.NOT_FOUND),
     STUDENT_CODE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Không tìm thấy mã sinh viên", HttpStatus.NOT_FOUND),
     STUDENT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Không tìm thấy sinh viên", HttpStatus.NOT_FOUND),
     REVIEW_CRITERIA_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Không tìm thấy tiêu chí đánh giá", HttpStatus.NOT_FOUND),

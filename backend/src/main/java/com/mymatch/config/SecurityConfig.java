@@ -57,6 +57,7 @@ public class SecurityConfig {
             "/review-criteria/**",
             "/payments/qr-code",
             "/plans/**",
+            "/banners/**",
     };
 
     private final CustomJwtDecoder customJwtDecoder;
