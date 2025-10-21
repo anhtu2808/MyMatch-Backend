@@ -8,15 +8,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 public interface BannerService {
-//    @PreAuthorize("hasAuthority('banner:create')")
+    @PreAuthorize("hasAuthority('banner:create')")
     BannerResponse createBanner(BannerCreateRequest req);
 
     BannerResponse getById(Long id);
 
-//    @PreAuthorize("hasAuthority('banner:update')")
+    @PreAuthorize("hasAuthority('banner:update')")
     BannerResponse updateBanner(Long id, BannerUpdateRequest req);
 
-//    @PreAuthorize("hasAuthority('banner:delete')")
+    @PreAuthorize("hasAuthority('banner:delete')")
     void deleteBanner(Long id);
 
     List<BannerResponse> getAllBanners();
