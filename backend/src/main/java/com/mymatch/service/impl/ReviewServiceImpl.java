@@ -98,11 +98,11 @@ public class ReviewServiceImpl implements ReviewService {
         review = reviewRepository.save(review);
         // thưởng coin cho sinh viên
         WalletRequest walletRequest = WalletRequest.builder()
-                .coin(10L)
+                .coin(500L)
                 .userId(student.getUser().getId())
                 .source(TransactionSource.REWARD)
                 .type(TransactionType.IN)
-                .description("Nhận 20 coin khi đánh giá giảng viên")
+                .description("Nhận 500 coin khi đánh giá giảng viên")
                 .build();
         walletService.addToCoinWallet(walletRequest);
         return reviewMapper.toReviewResponse(review);
@@ -176,8 +176,24 @@ public class ReviewServiceImpl implements ReviewService {
         if (!isAdmin && !review.getStudent().getUser().getId().equals(currentUserId)) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
+        var isVerifyBonus = false;
+        if (request.getIsVerified() && !review.getIsVerified()) {
+            isVerifyBonus = true;
+
+        }
         reviewMapper.updateReview(review, request);
         reviewRepository.save(review);
+        if (isVerifyBonus) {
+            WalletRequest walletRequest = WalletRequest.builder()
+                    .coin(1000L)
+                    .userId(review.getStudent().getUser().getId())
+                    .source(TransactionSource.REWARD)
+                    .type(TransactionType.IN)
+                    .description("Nhận 1000 coin khi đánh giá được xác thực")
+                    .build();
+            walletService.addToCoinWallet(walletRequest);
+        }
+
         return reviewMapper.toReviewResponse(review);
     }
 
@@ -185,7 +201,7 @@ public class ReviewServiceImpl implements ReviewService {
     public String uploadEvidenceFile(MultipartFile file) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
         String uuid = java.util.UUID.randomUUID().toString();
-        return fileManagerService.save(file, buildFilePath(currentUserId, uuid), StorageType.PRIVATE);
+        return fileManagerService.save(file, buildFilePath(currentUserId, uuid), StorageType.PUBLIC);
     }
 
     private Double setOverallScore(List<ReviewDetail> details) {
