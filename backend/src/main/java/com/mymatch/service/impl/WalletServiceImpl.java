@@ -36,7 +36,7 @@ public class WalletServiceImpl implements WalletService {
     TransactionMapper transactionMapper;
     TransactionService transactionService;
 
-    private static final double EXCHANGE_RATE = 1000.0;
+    private static final double EXCHANGE_RATE = 1.0;
 
     @Override
     public WalletResponse getWallet() {
