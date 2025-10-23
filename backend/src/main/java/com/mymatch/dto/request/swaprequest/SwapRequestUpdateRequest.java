@@ -17,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SwapRequestUpdateRequest {
-    String codeCourse;
+    Long courseId;
 
     String fromClass;
     String targetClass;
