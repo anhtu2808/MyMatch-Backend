@@ -1,4 +1,4 @@
-    package com.mymatch.service.impl;
+package com.mymatch.service.impl;
 
     import com.mymatch.dto.request.swaprequest.SwapRequestCreationRequest;
     import com.mymatch.dto.request.swaprequest.SwapRequestFilterRequest;
@@ -51,14 +51,14 @@
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
             Student student = studentRepository.findById(user.getStudent().getId()).orElseThrow(()
                     -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-            Course course = courseRepository.findByCode(request.getCodeCourse()).orElseThrow(()
+            Course course = courseRepository.findById(request.getCourseId()).orElseThrow(()
                     -> new AppException(ErrorCode.COURSE_NOT_FOUND));
             Lecturer lecturerFrom = lecturerRepository.findByCode(request.getCodeLecturerFrom()).orElseThrow(()
                     -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
             Lecturer lecturerTo = lecturerRepository.findByCode(request.getCodeLecturerTo()).orElseThrow(()
                     -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
-            log.info("[auto-match] courseCode={}, from={}, to={}, lecFromCode={}, lecToCode={}, slotFrom={}, slotTo={}, excludeStudent={}",
-                    request.getCodeCourse(), request.getFromClass(), request.getTargetClass(),
+            log.info("[auto-match] courseId={}, from={}, to={}, lecFromCode={}, lecToCode={}, slotFrom={}, slotTo={}, excludeStudent={}",
+                    request.getCourseId(), request.getFromClass(), request.getTargetClass(),
                     request.getCodeLecturerFrom(), request.getCodeLecturerTo(),
                     request.getSlotFrom(), request.getSlotTo(), student.getId());
 
@@ -113,8 +113,8 @@
                     .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_FOUND));
             swapRequestMapper.update(swapRequest, request);
 
-            if (request.getCodeCourse() != null && !request.getCodeCourse().isBlank()) {
-                Course course = courseRepository.findByCode(request.getCodeCourse())
+            if (request.getCourseId() != null) {
+                Course course = courseRepository.findById(request.getCourseId())
                         .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
                 swapRequest.setCourse(course);
             }

@@ -21,7 +21,7 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SwapRequestCreationRequest {
     @NotNull
-    String codeCourse;
+    Long courseId;
 
     @NotBlank
     String fromClass;
