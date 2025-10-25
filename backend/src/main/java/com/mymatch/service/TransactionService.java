@@ -1,5 +1,6 @@
 package com.mymatch.service;
 
+import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.transaction.TransactionResponse;
 import com.mymatch.entity.Transaction;
 import com.mymatch.entity.Wallet;
@@ -24,4 +25,6 @@ public interface TransactionService {
     TransactionResponse markAsFailed(Transaction transaction, String reason);
 
     void rollbackTransaction(Transaction transaction, String reason);
+
+    PageResponse<TransactionResponse> getMyTransactions(int page, int size, String sortBy, String sortDirection);
 }

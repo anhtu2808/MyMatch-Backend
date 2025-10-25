@@ -1,6 +1,8 @@
 package com.mymatch.repository;
 
 import com.mymatch.entity.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +12,5 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     Optional<Transaction> findByTransactionCode(String transactionCode);
     boolean existsByTransactionCode(String transactionCode);
+    Page<Transaction> findByWalletId(Long walletId, Pageable pageable);
 }
