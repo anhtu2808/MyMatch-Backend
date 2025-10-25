@@ -62,7 +62,7 @@ public class WalletServiceImpl implements WalletService {
                 wallet, coinAmount, amountVND,
                 TransactionType.IN,
                 TransactionSource.TOP_UP,
-                "User requested to top up " + amountVND + " VND"
+                "Người dùng yêu cầu nạp " + amountVND + " VND"
         );
         try {
             wallet.setCoin(wallet.getCoin() + coinAmount);
