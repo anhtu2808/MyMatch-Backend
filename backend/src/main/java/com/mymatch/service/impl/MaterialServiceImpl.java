@@ -155,14 +155,14 @@ public class MaterialServiceImpl implements MaterialService {
                     .userId(currentUserId)
                     .source(TransactionSource.SERVICE_PURCHASE)
                     .coin(material.getPrice())
-                    .description("Purchase material: " + material.getName())
+                    .description("Mua tài liệu: " + material.getName())
                     .build();
             WalletRequest rewardRequest = WalletRequest.builder()
                     .type(TransactionType.IN)
                     .userId(material.getOwner().getId())
                     .source(TransactionSource.REWARD)
                     .coin(material.getPrice() * 80 / 100) // Owner gets 80% of the price
-                    .description("Sale of material: " + material.getName())
+                    .description("Bán tài liệu: " + material.getName())
                     .build();
             deductTransaction = walletService.deductFromWallet(deductRequest);
             rewardTransaction = walletService.addToCoinWallet(rewardRequest);
@@ -179,8 +179,8 @@ public class MaterialServiceImpl implements MaterialService {
                     .build();
             materialPurchaseRepository.save(purchase);
         } catch (Exception e) {
-            transactionService.rollbackTransaction(deductTransaction, "Purchase material failed: " + e.getMessage());
-            transactionService.rollbackTransaction(rewardTransaction, "Reward coin failed " + material.getName());
+            transactionService.rollbackTransaction(deductTransaction, "Mua tài liệu thất bại: " + e.getMessage());
+            transactionService.rollbackTransaction(rewardTransaction, "Thưởng coin thất bại cho tài liệu: " + material.getName());
             throw e;
         }
         return materialMapper.toMaterialResponse(material);
