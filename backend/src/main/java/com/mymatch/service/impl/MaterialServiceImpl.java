@@ -172,8 +172,8 @@ public class MaterialServiceImpl implements MaterialService {
                     .material(material)
                     .totalCoin(material.getPrice())
                     .transactionCode(deductTransaction.getTransactionCode())
-                    .platformFee(material.getPrice() * 10 / 100)
-                    .ownerEarning(material.getPrice() * 90 / 100)
+                    .platformFee(material.getPrice() * 20 / 100) // Platform fee 20%
+                    .ownerEarning(material.getPrice() * 80 / 100) // Owner earning 80%
                     .buyer(userRepository.findById(currentUserId)
                                          .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)))
                     .build();

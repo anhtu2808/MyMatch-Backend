@@ -48,7 +48,7 @@ public class TeamServiceImpl implements TeamService {
     TeamMemberMapper teamMemberMapper;
     WalletService walletService;
 
-    private static final long TEAM_SEARCH_FEE_COIN = 2L;
+    private static final long TEAM_SEARCH_FEE_COIN = 3000L;
 
     @Override
     @Transactional
