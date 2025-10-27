@@ -13,5 +13,6 @@ public class MaterialFilter {
     String description;
     Long lecturerId;
     Long ownerId;
+    Boolean isPurchased;
     Long courseId;
 }

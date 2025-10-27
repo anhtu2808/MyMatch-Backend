@@ -2,6 +2,9 @@ package com.mymatch.specification;
 
 import com.mymatch.dto.request.material.MaterialFilter;
 import com.mymatch.entity.Material;
+import com.mymatch.utils.SecurityUtil;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
@@ -52,6 +55,22 @@ public class MaterialSpecification {
                         root.get("course").get("id"),
                         filter.getCourseId()
                 ));
+            }
+            Long currentUserId = SecurityUtil.getCurrentUserId();
+
+            if (filter.getIsPurchased() != null) {
+                // Join với bảng MaterialPurchase
+                Join<Object, Object> purchases = root.join("purchases", JoinType.LEFT);
+                Predicate purchasedPredicate = criteriaBuilder.equal(purchases.get("buyer").get("id"), currentUserId);
+
+                if (filter.getIsPurchased()) {
+                    predicates.add(purchasedPredicate);
+                } else {
+                    // not purchased: material mà người dùng chưa mua
+                    predicates.add(criteriaBuilder.not(purchasedPredicate));
+                }
+                // tránh trùng dữ liệu khi join
+                query.distinct(true);
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

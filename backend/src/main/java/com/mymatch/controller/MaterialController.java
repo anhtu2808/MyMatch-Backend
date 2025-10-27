@@ -63,7 +63,7 @@ public class MaterialController {
 
     @GetMapping
     public ApiResponse<PageResponse<MaterialResponse>> getAllMaterials(
-            MaterialFilter filter,
+            @ModelAttribute MaterialFilter filter,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
