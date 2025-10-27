@@ -8,7 +8,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -31,6 +30,7 @@ public class SwapRequestUpdateRequest {
     String reason;
     Visibility visibility;
     SwapRequestStatus status;
+    LocalDateTime expiresAt;
 
     Set<DayOfWeek> fromDays;
     Set<DayOfWeek> toDays;

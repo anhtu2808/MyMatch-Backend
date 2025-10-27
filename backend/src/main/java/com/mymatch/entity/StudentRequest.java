@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -38,6 +39,9 @@ public class StudentRequest extends AbstractAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     RequestStatus status = RequestStatus.OPEN;
+
+    @Column(name = "expires_at")
+    LocalDateTime expiresAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
