@@ -46,7 +46,7 @@ public class StudentRequestServiceImpl implements StudentRequestService {
     SkillRepository skillRepository;
     WalletService walletService;
 
-    private static final long STUDENT_REQUEST_FEE_COIN = 2L;
+    private static final long STUDENT_REQUEST_FEE_COIN = 2000L;
 
     @Transactional
     @Override
