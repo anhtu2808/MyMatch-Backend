@@ -7,9 +7,11 @@ import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface SwapRequestRepository extends JpaRepository<SwapRequest, Long>, JpaSpecificationExecutor<SwapRequest> {
@@ -64,4 +66,15 @@ Optional<SwapRequest> findMatchingPartnerRequests(
             @Param("slotTo") ClassesSlot slotTo,
             @Param("studentId") Long studentId
     );
+
+    // Đổi trạng thái các request đã quá hạn: chỉ đổi từ SENT → EXPIRED
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE SwapRequest sr
+           SET sr.status = com.mymatch.enums.SwapRequestStatus.EXPIRED
+         WHERE sr.deleted = 0
+           AND sr.status = com.mymatch.enums.SwapRequestStatus.SENT
+           AND sr.expiresAt < :now
+    """)
+    int expireSentRequests(@Param("now") LocalDateTime now);
 }

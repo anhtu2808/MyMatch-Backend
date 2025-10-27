@@ -35,5 +35,6 @@ public class StudentRequestResponse {
     String description;
     RequestStatus status;
     LocalDateTime createAt;
+    LocalDateTime expiresAt;
     Set<StudentRequestSkillResponse> skills;
 }

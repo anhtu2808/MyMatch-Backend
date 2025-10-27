@@ -3,6 +3,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -28,4 +29,6 @@ public class StudentRequestCreationRequest {
     Long campusId;
 
     Set<Long> skillIds;
+
+    LocalDateTime expiresAt = LocalDateTime.now().plusDays(14); // optional, sẽ set default 14 ngày trong service nếu null
 }

@@ -3,6 +3,8 @@ import com.mymatch.enums.RequestStatus;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -22,5 +24,5 @@ public class StudentRequestUpdateRequest {
     @NotNull Long campusId;
     Set<Long> skillIds;
     RequestStatus status;
-
+    LocalDateTime expiresAt;
 }
