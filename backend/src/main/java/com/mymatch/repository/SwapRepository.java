@@ -16,6 +16,7 @@ public interface SwapRepository extends JpaRepository<Swap, Long>, JpaSpecificat
        select (count(s)>0) from Swap s
        where (s.requestFrom.id = :swapRequestCurrent and s.requestTo.id = :existingSwapRequest)
           or (s.requestFrom.id = :existingSwapRequest and s.requestTo.id = :swapRequestCurrent)
+          and s.deleted = 0
     """)
     boolean existsByPairEitherOrder(@Param("swapRequestCurrent") Long swapRequestCurrent, @Param("existingSwapRequest") Long existingSwapRequest);
 }

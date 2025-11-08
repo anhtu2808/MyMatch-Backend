@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AgentMigrationStateService">
+    <option name="pendingSessionIds">
+      <option value="fb8041ef-d8c7-4c42-bf94-0997423e35a1" />
+    </option>
+    <option name="pendingTurns">
+      <map>
+        <entry key="fb8041ef-d8c7-4c42-bf94-0997423e35a1">
+          <value>
+            <set>
+              <option value="76c9ab53-5823-4f7f-82ba-d5f48af5fc84" />
+              <option value="f8f9adc3-bb9e-4acf-a005-f918ca9f6020" />
+              <option value="7735c8e8-ec92-4852-a06b-57c3c0254945" />
+              <option value="7c0f7739-ca77-47c5-971b-04fba394b84a" />
+              <option value="3baa1444-0866-4676-8401-1fee819db29b" />
+            </set>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <pendingWorkingSetItems>
+      <entry key="fb8041ef-d8c7-4c42-bf94-0997423e35a1">
+        <set>
+          <option value="file://$PROJECT_DIR$/backend/src/main/java/com/mymatch/exception/GlobalExceptionHandler.java" />
+          <option value="file://$PROJECT_DIR$/backend/src/main/java/com/mymatch/dto/request/team/TeamCreationRequest.java" />
+          <option value="file://$PROJECT_DIR$/backend/src/main/java/com/mymatch/service/impl/SwapServiceImpl.java" />
+          <option value="file://$PROJECT_DIR$/backend/src/main/java/com/mymatch/service/impl/SwapRequestServiceImpl.java" />
+        </set>
+      </entry>
+    </pendingWorkingSetItems>
+  </component>
+</project>

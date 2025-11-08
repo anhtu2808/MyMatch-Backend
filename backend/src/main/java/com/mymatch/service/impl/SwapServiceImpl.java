@@ -18,6 +18,7 @@ import com.mymatch.repository.*;
 import com.mymatch.service.SwapService;
 import com.mymatch.specification.SwapSpecification;
 import com.mymatch.utils.SecurityUtil;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -69,17 +70,25 @@ public class SwapServiceImpl implements SwapService {
     @Override
     public PageResponse<SwapResponse> getAll(SwapFilterRequest req) {
         Specification<Swap> spec = SwapSpecification.withFilter(req);
-        Long currentUserService = userRepository.findById(SecurityUtil.getCurrentUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND))
-                .getStudent()
-                .getId();
-        final Long viewerId = hasAuthority("swap:read") ? null : currentUserService;
 
-        if (viewerId != null) {
+        // Xác định viewerId: nếu không có quyền swap:read thì phải filter theo student hiện tại
+        final Long viewerId;
+        if (!hasAuthority("swap:read")) {
+            User currentUser = userRepository.findById(SecurityUtil.getCurrentUserId())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+            Student student = currentUser.getStudent();
+            if (student == null) {
+                throw new AppException(ErrorCode.STUDENT_INFO_REQUIRED);
+            }
+            viewerId = student.getId();
+
+            // Apply filter: chỉ lấy swap mà user hiện tại là studentFrom hoặc studentTo
             spec = spec.and((root, q, cb) -> cb.or(
-                    cb.equal(root.get("studentFrom").get("id"), viewerId),
-                    cb.equal(root.get("studentTo").get("id"), viewerId)
+                    cb.equal(root.get("studentFrom").get("id"), viewerId)
             ));
+        } else {
+            viewerId = null; // Admin/staff có quyền xem tất cả
         }
 
         String sortBy = (req.getSortBy() == null || req.getSortBy().isBlank()) ? "id" : req.getSortBy();
@@ -127,6 +136,11 @@ public class SwapServiceImpl implements SwapService {
         Student currentStudent = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND))
                 .getStudent();
+
+        if (currentStudent == null) {
+            throw new AppException(ErrorCode.STUDENT_INFO_REQUIRED);
+        }
+
         // Get Swap
         Swap swap = swapRepository.findById(swapId)
                 .orElseThrow(() -> new AppException(ErrorCode.SWAP_NOT_FOUND));
@@ -135,20 +149,38 @@ public class SwapServiceImpl implements SwapService {
         if (swap.getStatus() != SwapStatus.PENDING) {
             return swapMapper.toResponse(swap);
         }
+
         // Check current user is studentFrom or studentTo
-        boolean iAmFrom = Objects.equals(currentUserId, swap.getStudentFrom().getUser().getId());
+        boolean iAmFrom = Objects.equals(currentStudent.getId(), swap.getStudentFrom().getId());
+        boolean iAmTo = Objects.equals(currentStudent.getId(), swap.getStudentTo().getId());
+
+        // Validation: User must be either studentFrom or studentTo
+        if (!iAmFrom && !iAmTo) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
+
+        // CHỈ CHO PHÉP studentFrom (A - người tạo trước) quyết định
+        if (!iAmFrom) {
+            throw new AppException(ErrorCode.ACCESS_DENIED); // B không có quyền quyết định
+        }
+
         SwapDecision newDecision = req.getDecision();
 
         if (newDecision == SwapDecision.PENDING) {
             throw new AppException(ErrorCode.INVALID_SWAP_DECISION);
         }
-        // Update decision
-        updateUserDecision(swap, iAmFrom, newDecision, req.getReason());
-        // Update Swap status
-        SwapStatus outcome = computeSwapOutcome(swap.getFromDecision(), swap.getToDecision());
-        applyOutcomeAndSyncRequests(swap, outcome);
-        return toViewerResponse(swap, currentStudent.getId());
+        swap.setFromDecision(newDecision);
+        swap.setToDecision(SwapDecision.ACCEPTED);
 
+        // Update Swap status dựa trên decision của A
+        if (newDecision == SwapDecision.ACCEPTED) {
+            approveSwapAndArchiveRequests(swap);
+        } else {
+            rejectSwapAndRetainRequests(swap);
+        }
+
+
+        return toViewerResponse(swap, currentStudent.getId());
     }
     private void updateUserDecision(Swap swap, boolean iAmFrom, SwapDecision decision, String reason) {        if (iAmFrom && swap.getFromDecision() == decision) return;
         if (!iAmFrom && swap.getToDecision() == decision) return;
