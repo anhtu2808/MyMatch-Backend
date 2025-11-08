@@ -18,6 +18,7 @@ import com.mymatch.repository.*;
 import com.mymatch.service.SwapService;
 import com.mymatch.specification.SwapSpecification;
 import com.mymatch.utils.SecurityUtil;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -52,8 +53,8 @@ public class SwapServiceImpl implements SwapService {
         Swap swap = Swap.builder()
                 .requestFrom(existingSwapRequest)
                 .requestTo(swapRequestCurrent)
-                .studentFrom(swapRequestCurrent.getStudent())
-                .studentTo(existingSwapRequest.getStudent())
+                .studentFrom(existingSwapRequest.getStudent())
+                .studentTo(swapRequestCurrent.getStudent())
                 .fromDecision(SwapDecision.PENDING)
                 .toDecision(SwapDecision.PENDING)
                 .status(SwapStatus.PENDING)
@@ -69,17 +70,26 @@ public class SwapServiceImpl implements SwapService {
     @Override
     public PageResponse<SwapResponse> getAll(SwapFilterRequest req) {
         Specification<Swap> spec = SwapSpecification.withFilter(req);
-        Long currentUserService = userRepository.findById(SecurityUtil.getCurrentUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND))
-                .getStudent()
-                .getId();
-        final Long viewerId = hasAuthority("swap:read") ? null : currentUserService;
 
-        if (viewerId != null) {
+        // Xác định viewerId: nếu không có quyền swap:read thì phải filter theo student hiện tại
+        final Long viewerId;
+        if (!hasAuthority("swap:read")) {
+            User currentUser = userRepository.findById(SecurityUtil.getCurrentUserId())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+            Student student = currentUser.getStudent();
+            if (student == null) {
+                throw new AppException(ErrorCode.STUDENT_INFO_REQUIRED);
+            }
+            viewerId = student.getId();
+
+            // Apply filter: chỉ lấy swap mà user hiện tại là studentFrom hoặc studentTo
             spec = spec.and((root, q, cb) -> cb.or(
                     cb.equal(root.get("studentFrom").get("id"), viewerId),
                     cb.equal(root.get("studentTo").get("id"), viewerId)
             ));
+        } else {
+            viewerId = null; // Admin/staff có quyền xem tất cả
         }
 
         String sortBy = (req.getSortBy() == null || req.getSortBy().isBlank()) ? "id" : req.getSortBy();

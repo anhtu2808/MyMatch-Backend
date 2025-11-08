@@ -9,6 +9,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.time.LocalDateTime;
 
@@ -35,10 +37,14 @@ public class Swap extends AbstractAuditingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "request_from_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)  // Đổi từ LAZY sang EAGER
+    @JoinColumn(name = "request_from_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     SwapRequest requestFrom;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "request_to_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)  // Đổi từ LAZY sang EAGER
+    @JoinColumn(name = "request_to_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     SwapRequest requestTo;
 
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "student_from_id", nullable = false)
