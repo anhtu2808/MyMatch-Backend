@@ -50,10 +50,10 @@ public class SwapServiceImpl implements SwapService {
         log.info("Creating swap between SwapRequest ID {} and SwapRequest ID {}",
                 swapRequestCurrent.getId(), existingSwapRequest.getId());
         Swap swap = Swap.builder()
-                .requestFrom(swapRequestCurrent)
-                .requestTo(existingSwapRequest)
-                .studentFrom(existingSwapRequest.getStudent())
-                .studentTo(swapRequestCurrent.getStudent())
+                .requestFrom(existingSwapRequest)
+                .requestTo(swapRequestCurrent)
+                .studentFrom(swapRequestCurrent.getStudent())
+                .studentTo(existingSwapRequest.getStudent())
                 .fromDecision(SwapDecision.PENDING)
                 .toDecision(SwapDecision.PENDING)
                 .status(SwapStatus.PENDING)
