@@ -73,27 +73,41 @@ public class GlobalExceptionHandler {
 
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
         Map<String, Object> attributes = null;
-        try {
-            errorCode = ErrorCode.valueOf(enumKey);
+        boolean isEnumKey = false;
 
-            var constraintViolation =
-                    exception.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
+        // Chỉ parse ErrorCode nếu message là UPPERCASE với underscore (enum pattern)
+        if (enumKey != null && enumKey.matches("^[A-Z][A-Z_0-9]*$")) {
+            try {
+                errorCode = ErrorCode.valueOf(enumKey);
+                isEnumKey = true;
 
-            attributes = constraintViolation.getConstraintDescriptor().getAttributes();
+                var constraintViolation =
+                        exception.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
 
-            log.info(attributes.toString());
+                attributes = constraintViolation.getConstraintDescriptor().getAttributes();
 
-        } catch (IllegalArgumentException e) {
+                log.info(attributes.toString());
 
+            } catch (IllegalArgumentException e) {
+                isEnumKey = false;
+            }
         }
 
         ApiResponse apiResponse = new ApiResponse();
 
         apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(
-                Objects.nonNull(attributes)
-                        ? mapAttribute(errorCode.getMessage(), attributes)
-                        : errorCode.getMessage());
+
+        // Nếu là ErrorCode enum thì dùng message từ enum, còn không thì dùng message validation gốc
+        if (isEnumKey) {
+            apiResponse.setMessage(
+                    Objects.nonNull(attributes)
+                            ? mapAttribute(errorCode.getMessage(), attributes)
+                            : errorCode.getMessage());
+        } else {
+            // Dùng validation message gốc (VD: "must be less than or equal to 50")
+            apiResponse.setMessage(enumKey != null ? enumKey : "Dữ liệu không hợp lệ");
+        }
+
         if (exception.getFieldError() != null) {
             apiResponse.setResult(Map.of(exception.getFieldError().getField(), enumKey));
         }
