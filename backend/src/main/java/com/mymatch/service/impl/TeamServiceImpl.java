@@ -212,8 +212,14 @@ public class TeamServiceImpl implements TeamService {
                     : t.getRequests().stream().map(teamRequestMapper::toResponse).toList();
             r.setTeamRequest(reqs);
 
+            // map teamMember
+            var members = (t.getTeamMembers() == null) ? List.<TeamMemberResponse>of()
+                    : t.getTeamMembers().stream().map(teamMemberMapper::toResponse).toList();
+            r.setTeamMember(members);
+
             // set counts
             r.setRequestCount(reqs.size());
+            r.setMemberCount(members.size());
             return r;
 
         }).toList();
