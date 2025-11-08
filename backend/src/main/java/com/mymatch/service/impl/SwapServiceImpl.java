@@ -85,8 +85,7 @@ public class SwapServiceImpl implements SwapService {
 
             // Apply filter: chỉ lấy swap mà user hiện tại là studentFrom hoặc studentTo
             spec = spec.and((root, q, cb) -> cb.or(
-                    cb.equal(root.get("studentFrom").get("id"), viewerId),
-                    cb.equal(root.get("studentTo").get("id"), viewerId)
+                    cb.equal(root.get("studentFrom").get("id"), viewerId)
             ));
         } else {
             viewerId = null; // Admin/staff có quyền xem tất cả
