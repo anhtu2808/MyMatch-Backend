@@ -1,13 +1,11 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
+import java.util.Objects;
+
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -16,8 +14,8 @@ import java.util.Objects;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-//@SQLDelete(sql = "UPDATE student_request_skill SET deleted = 1 WHERE id = ?")
-//@SQLRestriction("deleted = 0")
+// @SQLDelete(sql = "UPDATE student_request_skill SET deleted = 1 WHERE id = ?")
+// @SQLRestriction("deleted = 0")
 public class StudentRequestSkill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

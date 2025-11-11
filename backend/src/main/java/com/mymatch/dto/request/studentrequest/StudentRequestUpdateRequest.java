@@ -1,12 +1,14 @@
 package com.mymatch.dto.request.studentrequest;
-import com.mymatch.enums.RequestStatus;
-import jakarta.validation.constraints.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
+
+import jakarta.validation.constraints.*;
+
+import com.mymatch.enums.RequestStatus;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -14,14 +16,27 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class StudentRequestUpdateRequest {
-    @NotBlank String requestDetail;
-    @PositiveOrZero Double goal;
-    @Size(max = 8) String classCode;
-    @Size(max = 1000) String description;
+    @NotBlank
+    String requestDetail;
 
-    @NotNull Long courseId;
-    @NotNull Long semesterId;
-    @NotNull Long campusId;
+    @PositiveOrZero
+    Double goal;
+
+    @Size(max = 8)
+    String classCode;
+
+    @Size(max = 1000)
+    String description;
+
+    @NotNull
+    Long courseId;
+
+    @NotNull
+    Long semesterId;
+
+    @NotNull
+    Long campusId;
+
     Set<Long> skillIds;
     RequestStatus status;
     LocalDateTime expiresAt;

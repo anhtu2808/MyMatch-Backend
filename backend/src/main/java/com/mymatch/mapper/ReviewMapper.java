@@ -1,15 +1,14 @@
 package com.mymatch.mapper;
 
-import com.mymatch.dto.request.review.ReviewCreationRequest;
-import com.mymatch.dto.request.review.ReviewUpdateRequest;
-import com.mymatch.dto.response.review.ReviewResponse;
-import com.mymatch.entity.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import java.util.List;
+import com.mymatch.dto.request.review.ReviewCreationRequest;
+import com.mymatch.dto.request.review.ReviewUpdateRequest;
+import com.mymatch.dto.response.review.ReviewResponse;
+import com.mymatch.entity.*;
 
 @Mapper(
         componentModel = "spring",
@@ -27,7 +26,6 @@ public interface ReviewMapper {
     @Mapping(target = "isAnonymous", source = "request.isAnonymous")
     @Mapping(target = "evidenceUrl", source = "request.evidenceUrl")
     Review toReview(ReviewCreationRequest request, Lecturer lecturer, Course course, Student student);
-
 
     ReviewResponse toReviewResponse(Review review);
 

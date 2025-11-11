@@ -1,15 +1,16 @@
 package com.mymatch.dto.response.swaprequest;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.util.Set;
+
 import com.mymatch.dto.response.course.CourseResponse;
 import com.mymatch.dto.response.lecturer.LecturerResponse;
 import com.mymatch.dto.response.student.StudentResponse;
 import com.mymatch.enums.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Data
 @Builder

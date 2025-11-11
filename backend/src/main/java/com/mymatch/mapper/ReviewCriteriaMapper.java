@@ -1,10 +1,11 @@
 package com.mymatch.mapper;
 
+import org.mapstruct.*;
+
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaCreateRequest;
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaUpdateRequest;
 import com.mymatch.dto.response.reviewcriteria.ReviewCriteriaResponse;
 import com.mymatch.entity.ReviewCriteria;
-import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface ReviewCriteriaMapper {

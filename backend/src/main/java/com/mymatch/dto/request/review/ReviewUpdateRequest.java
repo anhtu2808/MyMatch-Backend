@@ -1,6 +1,5 @@
 package com.mymatch.dto.request.review;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ReviewUpdateRequest {
-    Boolean isVerified;   // only for admin
+    Boolean isVerified; // only for admin
     String evidenceUrl;
-
 }

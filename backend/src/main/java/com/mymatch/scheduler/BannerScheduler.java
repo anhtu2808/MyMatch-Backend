@@ -1,16 +1,18 @@
 package com.mymatch.scheduler;
 
-import com.mymatch.entity.Banner;
-import com.mymatch.enums.BannerStatus;
-import com.mymatch.repository.BannerRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.mymatch.entity.Banner;
+import com.mymatch.enums.BannerStatus;
+import com.mymatch.repository.BannerRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
@@ -36,8 +38,7 @@ public class BannerScheduler {
         for (Banner banner : expiredBanners) {
             banner.setStatus(BannerStatus.EXPIRED);
             totalUpdated++;
-            log.info("Banner ID {} status changed to EXPIRED (endDate: {})",
-                    banner.getId(), banner.getEndDate());
+            log.info("Banner ID {} status changed to EXPIRED (endDate: {})", banner.getId(), banner.getEndDate());
         }
         if (!expiredBanners.isEmpty()) {
             bannerRepository.saveAll(expiredBanners);
@@ -48,8 +49,11 @@ public class BannerScheduler {
         for (Banner banner : activeBanners) {
             banner.setStatus(BannerStatus.ACTIVE);
             totalUpdated++;
-            log.info("Banner ID {} status changed to ACTIVE (startDate: {}, endDate: {})",
-                    banner.getId(), banner.getStartDate(), banner.getEndDate());
+            log.info(
+                    "Banner ID {} status changed to ACTIVE (startDate: {}, endDate: {})",
+                    banner.getId(),
+                    banner.getStartDate(),
+                    banner.getEndDate());
         }
         if (!activeBanners.isEmpty()) {
             bannerRepository.saveAll(activeBanners);
@@ -60,8 +64,7 @@ public class BannerScheduler {
         for (Banner banner : inactiveBanners) {
             banner.setStatus(BannerStatus.INACTIVE);
             totalUpdated++;
-            log.info("Banner ID {} status changed to INACTIVE (startDate: {})",
-                    banner.getId(), banner.getStartDate());
+            log.info("Banner ID {} status changed to INACTIVE (startDate: {})", banner.getId(), banner.getStartDate());
         }
         if (!inactiveBanners.isEmpty()) {
             bannerRepository.saveAll(inactiveBanners);

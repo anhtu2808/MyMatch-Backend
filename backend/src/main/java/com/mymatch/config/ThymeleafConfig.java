@@ -14,6 +14,7 @@ public class ThymeleafConfig {
         templateEngine.setTemplateResolver(thymeleafTemplateResolver());
         return templateEngine;
     }
+
     @Bean
     public ClassLoaderTemplateResolver thymeleafTemplateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();

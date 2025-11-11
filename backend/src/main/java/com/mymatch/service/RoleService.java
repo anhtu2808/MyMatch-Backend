@@ -1,13 +1,13 @@
 package com.mymatch.service;
 
-import com.mymatch.dto.request.role.RoleCreationRequest;
+import java.util.List;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.mymatch.dto.request.role.RoleUpdateRequest;
 import com.mymatch.dto.response.role.RoleResponse;
 import com.mymatch.entity.Role;
 import com.mymatch.enums.RoleType;
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import java.util.List;
 
 public interface RoleService {
 
@@ -23,5 +23,4 @@ public interface RoleService {
     List<RoleResponse> getAllRoles();
 
     Role getRoleWithPermissions(RoleType roleType);
-
 }

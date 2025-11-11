@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileDownloadResponse {
-    String nginxPath;     // /protected-files/user1/abc.pdf
-    String fileName;      // abc.pdf
+    String nginxPath; // /protected-files/user1/abc.pdf
+    String fileName; // abc.pdf
     String contentType;
 }

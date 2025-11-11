@@ -1,8 +1,7 @@
 package com.mymatch.dto.response.material;
 
-
-import com.mymatch.entity.Material;
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

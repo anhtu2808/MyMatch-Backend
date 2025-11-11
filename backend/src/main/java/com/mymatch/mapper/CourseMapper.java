@@ -1,18 +1,17 @@
 package com.mymatch.mapper;
 
-import com.mymatch.dto.request.course.CourseCreationRequest;
-import com.mymatch.dto.request.course.CourseUpdateRequest;
-import com.mymatch.dto.response.course.CourseResponse;
-import com.mymatch.entity.Course;
-import com.mymatch.entity.University;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(
-        componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+import com.mymatch.dto.request.course.CourseCreationRequest;
+import com.mymatch.dto.request.course.CourseUpdateRequest;
+import com.mymatch.dto.response.course.CourseResponse;
+import com.mymatch.entity.Course;
+import com.mymatch.entity.University;
+
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CourseMapper {
 
     @Mapping(target = "name", source = "request.name")

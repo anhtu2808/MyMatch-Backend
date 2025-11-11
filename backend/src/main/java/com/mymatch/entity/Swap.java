@@ -1,18 +1,21 @@
 package com.mymatch.entity;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.mymatch.common.AbstractAuditingEntity;
 import com.mymatch.enums.SwapDecision;
 import com.mymatch.enums.SwapMode;
 import com.mymatch.enums.SwapStatus;
-import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -24,12 +27,11 @@ import java.time.LocalDateTime;
 @Table(
         name = "swap",
         indexes = {
-                @Index(name = "idx_swap_request_from", columnList = "request_from_id"),
-                @Index(name = "idx_swap_request_to", columnList = "request_to_id"),
-                @Index(name = "idx_swap_student_from", columnList = "student_from_id"),
-                @Index(name = "idx_swap_student_to", columnList = "student_to_id")
-        }
-)
+            @Index(name = "idx_swap_request_from", columnList = "request_from_id"),
+            @Index(name = "idx_swap_request_to", columnList = "request_to_id"),
+            @Index(name = "idx_swap_student_from", columnList = "student_from_id"),
+            @Index(name = "idx_swap_student_to", columnList = "student_to_id")
+        })
 @SQLDelete(sql = "UPDATE swap SET deleted = 1 WHERE id = ?")
 @SQLRestriction("deleted = 0")
 public class Swap extends AbstractAuditingEntity {
@@ -37,20 +39,22 @@ public class Swap extends AbstractAuditingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)  // Đổi từ LAZY sang EAGER
+    @ManyToOne(fetch = FetchType.EAGER) // Đổi từ LAZY sang EAGER
     @JoinColumn(name = "request_from_id")
     @NotFound(action = NotFoundAction.IGNORE)
     SwapRequest requestFrom;
 
-    @ManyToOne(fetch = FetchType.EAGER)  // Đổi từ LAZY sang EAGER
+    @ManyToOne(fetch = FetchType.EAGER) // Đổi từ LAZY sang EAGER
     @JoinColumn(name = "request_to_id")
     @NotFound(action = NotFoundAction.IGNORE)
     SwapRequest requestTo;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "student_from_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_from_id", nullable = false)
     Student studentFrom;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "student_to_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_to_id", nullable = false)
     Student studentTo;
 
     @Enumerated(EnumType.STRING)

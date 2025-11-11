@@ -1,5 +1,16 @@
 package com.mymatch.service.impl;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.mymatch.dto.request.material.MaterialCreationRequest;
 import com.mymatch.dto.request.material.MaterialFilter;
 import com.mymatch.dto.request.material.MaterialUpdateRequest;
@@ -8,9 +19,7 @@ import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.filemanager.FileDownloadResponse;
 import com.mymatch.dto.response.material.MaterialItemResponse;
 import com.mymatch.dto.response.material.MaterialResponse;
-import com.mymatch.dto.response.transaction.TransactionResponse;
 import com.mymatch.entity.*;
-import com.mymatch.enums.StorageType;
 import com.mymatch.enums.TransactionSource;
 import com.mymatch.enums.TransactionType;
 import com.mymatch.exception.AppException;
@@ -18,27 +27,16 @@ import com.mymatch.exception.ErrorCode;
 import com.mymatch.mapper.MaterialItemMapper;
 import com.mymatch.mapper.MaterialMapper;
 import com.mymatch.repository.*;
-import com.mymatch.service.FileManagerService;
 import com.mymatch.service.MaterialService;
 import com.mymatch.service.TransactionService;
 import com.mymatch.service.WalletService;
 import com.mymatch.specification.MaterialSpecification;
 import com.mymatch.utils.SecurityUtil;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -57,27 +55,29 @@ public class MaterialServiceImpl implements MaterialService {
     MaterialItemRepository materialItemRepository;
     MaterialItemMapper materialItemMapper;
 
-
     @Override
     public MaterialResponse createMaterial(MaterialCreationRequest request) {
         Material material = materialMapper.toMaterial(request);
         if (request.getCourseId() != null) {
-            Course course = courseRepository.findById(request.getCourseId())
-                                            .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+            Course course = courseRepository
+                    .findById(request.getCourseId())
+                    .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
             material.setCourse(course);
         }
         if (request.getLecturerId() != null) {
-            Lecturer lecturer = lecturerRepository.findById(request.getLecturerId())
-                                                  .orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
+            Lecturer lecturer = lecturerRepository
+                    .findById(request.getLecturerId())
+                    .orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
             material.setLecturer(lecturer);
         }
         Long currentUserId = SecurityUtil.getCurrentUserId();
-        User owner = userRepository.findById(currentUserId)
-                                   .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User owner =
+                userRepository.findById(currentUserId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         material.setOwner(owner);
 
         material = materialRepository.save(material);
-        List<MaterialItem> materialItems = materialItemRepository.findAllByIdInAndMaterialIsNull(request.getMaterialItemIds());
+        List<MaterialItem> materialItems =
+                materialItemRepository.findAllByIdInAndMaterialIsNull(request.getMaterialItemIds());
         if (materialItems.isEmpty()) {
             throw new AppException(ErrorCode.MATERIAL_ITEM_NOT_FOUND_OR_ALREADY_ASSIGNED);
         }
@@ -89,18 +89,20 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public MaterialResponse getMaterialById(Long id) {
-        Material material = materialRepository.findById(id)
-                                              .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
-        boolean isPurchased = materialPurchaseRepository.existsByMaterial_IdAndAndBuyer_Id(id, SecurityUtil.getCurrentUserId());
-        User currentUser = userRepository.findById(SecurityUtil.getCurrentUserId())
-                                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Material material =
+                materialRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
+        boolean isPurchased =
+                materialPurchaseRepository.existsByMaterial_IdAndAndBuyer_Id(id, SecurityUtil.getCurrentUserId());
+        User currentUser = userRepository
+                .findById(SecurityUtil.getCurrentUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if (currentUser.getId().equals(material.getOwner().getId())) {
             isPurchased = true;
         }
         MaterialResponse materialResponse = materialMapper.toMaterialResponse(material);
         List<MaterialItemResponse> itemResponses = material.getItems().stream()
-                                                           .map(materialItemMapper::toMaterialItemResponse)
-                                                           .toList();
+                .map(materialItemMapper::toMaterialItemResponse)
+                .toList();
         materialResponse.setItems(itemResponses);
         materialResponse.setIsPurchased(isPurchased);
         return materialResponse;
@@ -108,8 +110,8 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public MaterialResponse updateMaterial(Long id, MaterialUpdateRequest request) {
-        Material material = materialRepository.findById(id)
-                                              .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
+        Material material =
+                materialRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
         Long currentUserId = SecurityUtil.getCurrentUserId();
         if (!Objects.equals(material.getOwner().getId(), currentUserId)) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
@@ -117,14 +119,16 @@ public class MaterialServiceImpl implements MaterialService {
         materialMapper.updateMaterial(material, request);
 
         if (request.getCourseId() != null) {
-            Course course = courseRepository.findById(request.getCourseId())
-                                            .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+            Course course = courseRepository
+                    .findById(request.getCourseId())
+                    .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
             material.setCourse(course);
         }
 
         if (request.getLecturerId() != null) {
-            Lecturer lecturer = lecturerRepository.findById(request.getLecturerId())
-                                                  .orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
+            Lecturer lecturer = lecturerRepository
+                    .findById(request.getLecturerId())
+                    .orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
             material.setLecturer(lecturer);
         }
 
@@ -135,14 +139,15 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     @Transactional
     public MaterialResponse purchaseMaterial(Long materialId) {
-        Material material = materialRepository.findById(materialId)
-                                              .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
+        Material material = materialRepository
+                .findById(materialId)
+                .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
         Long currentUserId = SecurityUtil.getCurrentUserId();
         if (currentUserId.equals(material.getOwner().getId())) {
             throw new AppException(ErrorCode.CANNOT_PURCHASE_OWN_MATERIAL);
         }
-        boolean alreadyPurchased = materialPurchaseRepository
-                .existsByMaterial_IdAndAndBuyer_Id(materialId, currentUserId);
+        boolean alreadyPurchased =
+                materialPurchaseRepository.existsByMaterial_IdAndAndBuyer_Id(materialId, currentUserId);
         if (alreadyPurchased) {
             throw new AppException(ErrorCode.MATERIAL_ALREADY_PURCHASED);
         }
@@ -174,40 +179,41 @@ public class MaterialServiceImpl implements MaterialService {
                     .transactionCode(deductTransaction.getTransactionCode())
                     .platformFee(material.getPrice() * 20 / 100) // Platform fee 20%
                     .ownerEarning(material.getPrice() * 80 / 100) // Owner earning 80%
-                    .buyer(userRepository.findById(currentUserId)
-                                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)))
+                    .buyer(userRepository
+                            .findById(currentUserId)
+                            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)))
                     .build();
             materialPurchaseRepository.save(purchase);
         } catch (Exception e) {
             transactionService.rollbackTransaction(deductTransaction, "Mua tài liệu thất bại: " + e.getMessage());
-            transactionService.rollbackTransaction(rewardTransaction, "Thưởng coin thất bại cho tài liệu: " + material.getName());
+            transactionService.rollbackTransaction(
+                    rewardTransaction, "Thưởng coin thất bại cho tài liệu: " + material.getName());
             throw e;
         }
         return materialMapper.toMaterialResponse(material);
     }
 
     @Override
-    public PageResponse<MaterialResponse> getAllMaterials(MaterialFilter filter, int page, int size, String sortBy, String sortDir) {
-        Pageable pageable = PageRequest.of(page - 1, size,
-                Sort.by(Sort.Direction.fromString(sortDir), sortBy));
+    public PageResponse<MaterialResponse> getAllMaterials(
+            MaterialFilter filter, int page, int size, String sortBy, String sortDir) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.fromString(sortDir), sortBy));
 
         Specification<Material> spec = MaterialSpecification.withFilter(filter);
         Page<Material> materialPage = materialRepository.findAll(spec, pageable);
 
         Long currentUserId = SecurityUtil.getCurrentUserId();
         List<MaterialResponse> responses = materialPage.getContent().stream()
-                                                       .map(material -> {
-                                                           MaterialResponse response = materialMapper.toMaterialResponse(material);
-                                                           boolean isPurchased = materialPurchaseRepository
-                                                                   .existsByMaterial_IdAndAndBuyer_Id(material.getId(), currentUserId);
-                                                           if (Objects.equals(material.getOwner()
-                                                                                      .getId(), currentUserId)) {
-                                                               isPurchased = true;
-                                                           }
-                                                           response.setIsPurchased(isPurchased);
-                                                           return response;
-                                                       })
-                                                       .toList();
+                .map(material -> {
+                    MaterialResponse response = materialMapper.toMaterialResponse(material);
+                    boolean isPurchased = materialPurchaseRepository.existsByMaterial_IdAndAndBuyer_Id(
+                            material.getId(), currentUserId);
+                    if (Objects.equals(material.getOwner().getId(), currentUserId)) {
+                        isPurchased = true;
+                    }
+                    response.setIsPurchased(isPurchased);
+                    return response;
+                })
+                .toList();
 
         return PageResponse.<MaterialResponse>builder()
                 .currentPage(page)
@@ -220,11 +226,11 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public FileDownloadResponse downloadMaterial(Long materialId) {
-        Material material = materialRepository.findById(materialId)
-                                              .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
+        Material material = materialRepository
+                .findById(materialId)
+                .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
         Long currentUserId = SecurityUtil.getCurrentUserId();
-        boolean isPurchased = materialPurchaseRepository
-                .existsByMaterial_IdAndAndBuyer_Id(materialId, currentUserId);
+        boolean isPurchased = materialPurchaseRepository.existsByMaterial_IdAndAndBuyer_Id(materialId, currentUserId);
         if (currentUserId.equals(material.getOwner().getId())) {
             isPurchased = true;
         }
@@ -233,13 +239,12 @@ public class MaterialServiceImpl implements MaterialService {
         }
 
         return null;
-
     }
 
     @Override
     public void deleteMaterial(Long id) {
-        Material material = materialRepository.findById(id)
-                                              .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
+        Material material =
+                materialRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.MATERIAL_NOT_FOUND));
 
         Long currentUserId = SecurityUtil.getCurrentUserId();
         if (!Objects.equals(material.getOwner().getId(), currentUserId)) {
@@ -247,7 +252,4 @@ public class MaterialServiceImpl implements MaterialService {
         }
         materialRepository.delete(material);
     }
-
-
-
 }

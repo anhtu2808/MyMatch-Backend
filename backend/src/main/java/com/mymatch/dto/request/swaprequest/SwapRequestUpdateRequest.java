@@ -1,14 +1,15 @@
 package com.mymatch.dto.request.swaprequest;
 
-import com.mymatch.enums.ClassesSlot;
-import com.mymatch.enums.SwapRequestStatus;
-import com.mymatch.enums.Visibility;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.Set;
+
+import com.mymatch.enums.ClassesSlot;
+import com.mymatch.enums.SwapRequestStatus;
+import com.mymatch.enums.Visibility;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder

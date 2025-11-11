@@ -1,5 +1,15 @@
 package com.mymatch.service.impl;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
 import com.corundumstudio.socketio.SocketIOServer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,18 +29,11 @@ import com.mymatch.repository.WebSocketSessionRepository;
 import com.mymatch.service.ChatMessageService;
 import com.mymatch.service.ConversationService;
 import com.mymatch.utils.SecurityUtil;
-import jakarta.transaction.Transactional;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -45,43 +48,43 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     WebSocketSessionRepository webSocketSessionRepository;
     ObjectMapper objectMapper;
     StudentRepository studentRepository;
+
     @Override
     @Transactional
     public ChatMessageResponse createChatMessage(ChatMessageCreationRequest request) throws JsonProcessingException {
         // Get current student (sender)
         Long currentUserId = SecurityUtil.getCurrentUserId();
-        Student sender = studentRepository.findByUserId(currentUserId)
+        Student sender = studentRepository
+                .findByUserId(currentUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         // Validate conversationId
-        Conversation conversation = conversationRepository.findById(request.getConversationId())
+        Conversation conversation = conversationRepository
+                .findById(request.getConversationId())
                 .orElseThrow(() -> new AppException(ErrorCode.CONVERSATION_NOT_FOUND));
         // Check if sender is a participant of the conversation
-        boolean isParticipant = conversation.getParticipants().stream()
-                .anyMatch(p -> p.getId().equals(sender.getId()));
+        boolean isParticipant =
+                conversation.getParticipants().stream().anyMatch(p -> p.getId().equals(sender.getId()));
         if (!isParticipant) {
             throw new AppException(ErrorCode.UNAUTHORIZED_ACCESS_CONVERSATION);
         }
 
         // Create chat message
         ChatMessage chatMessage = ChatMessage.builder()
-                        .sender(sender)
-                        .conversation(conversation)
-                        .message(request.getMessage())
+                .sender(sender)
+                .conversation(conversation)
+                .message(request.getMessage())
                 .build();
 
         // Get studentIds info of participants in the conversation
-        List<Long> studentIds =  conversation.getParticipants().stream()
-                .map(Student::getId).toList();
-        Map<String, WebSocketSession> webSocketSessions = webSocketSessionRepository
-                .findAllByStudentIdIn(studentIds).stream()
-                .collect(Collectors.toMap(
-                        WebSocketSession::getSocketSessionId,
-                        Function.identity()
-                ));
+        List<Long> studentIds =
+                conversation.getParticipants().stream().map(Student::getId).toList();
+        Map<String, WebSocketSession> webSocketSessions =
+                webSocketSessionRepository.findAllByStudentIdIn(studentIds).stream()
+                        .collect(Collectors.toMap(WebSocketSession::getSocketSessionId, Function.identity()));
         ChatMessageResponse chatMessageResponse = toChatMessageResponse(chatMessageRepository.save(chatMessage));
 
-        //Publish event websocket to client
+        // Publish event websocket to client
         socketIOServer.getAllClients().forEach(client -> {
             var webSocketSession = webSocketSessions.get(client.getSessionId().toString());
             if (Objects.nonNull(webSocketSession)) {
@@ -98,17 +101,20 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         // Convert to response
         return toChatMessageResponse(chatMessage);
     }
+
     private ChatMessageResponse toChatMessageResponse(ChatMessage chatMessage) {
-       var userId = SecurityUtil.getCurrentUserId();
-       var chatMessageResponse = chatMessageMapper.toChatMessageResponse(chatMessage);
-       chatMessageResponse.setMe(userId.equals(chatMessage.getSender().getUser().getId()));
-       return chatMessageResponse;
+        var userId = SecurityUtil.getCurrentUserId();
+        var chatMessageResponse = chatMessageMapper.toChatMessageResponse(chatMessage);
+        chatMessageResponse.setMe(
+                userId.equals(chatMessage.getSender().getUser().getId()));
+        return chatMessageResponse;
     }
 
     @Override
     public List<ChatMessageResponse> getMessages(Long conversationId) {
         // Validate conversationId
-        Conversation conversation = conversationRepository.findById(conversationId)
+        Conversation conversation = conversationRepository
+                .findById(conversationId)
                 .orElseThrow(() -> new AppException(ErrorCode.CONVERSATION_NOT_FOUND));
         // Check if current user is a participant of the conversation
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -117,9 +123,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         if (!isParticipant) {
             throw new AppException(ErrorCode.UNAUTHORIZED_ACCESS_CONVERSATION);
         }
-        List<ChatMessage> chatMessages = chatMessageRepository.findAllByConversationIdOrderByCreateAtAsc(conversationId);
-        return chatMessages.stream()
-                .map(this::toChatMessageResponse)
-                .toList();
+        List<ChatMessage> chatMessages =
+                chatMessageRepository.findAllByConversationIdOrderByCreateAtAsc(conversationId);
+        return chatMessages.stream().map(this::toChatMessageResponse).toList();
     }
 }

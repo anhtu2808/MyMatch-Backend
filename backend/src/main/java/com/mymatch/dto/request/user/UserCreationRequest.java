@@ -1,11 +1,13 @@
 package com.mymatch.dto.request.user;
 
-import com.mymatch.dto.request.student.StudentCreationRequest;
-import com.mymatch.enums.RoleType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+
+import com.mymatch.dto.request.student.StudentCreationRequest;
+import com.mymatch.enums.RoleType;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

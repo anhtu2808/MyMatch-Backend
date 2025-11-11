@@ -1,12 +1,14 @@
 package com.mymatch.specification;
 
-import com.mymatch.dto.request.swap.SwapFilterRequest;
-import com.mymatch.entity.Swap;
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.data.jpa.domain.Specification;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.criteria.Predicate;
+
+import org.springframework.data.jpa.domain.Specification;
+
+import com.mymatch.dto.request.swap.SwapFilterRequest;
+import com.mymatch.entity.Swap;
 
 public class SwapSpecification {
     public static Specification<Swap> withFilter(SwapFilterRequest f) {
@@ -28,8 +30,7 @@ public class SwapSpecification {
             if (f.getAnyStudentId() != null) {
                 ps.add(cb.or(
                         cb.equal(root.get("studentFrom").get("id"), f.getAnyStudentId()),
-                        cb.equal(root.get("studentTo").get("id"), f.getAnyStudentId())
-                ));
+                        cb.equal(root.get("studentTo").get("id"), f.getAnyStudentId())));
             }
             if (f.getMode() != null) {
                 ps.add(cb.equal(root.get("mode"), f.getMode()));

@@ -1,5 +1,12 @@
 package com.mymatch.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+
 import com.mymatch.dto.request.lecturer.LecturerCreationRequest;
 import com.mymatch.dto.request.lecturer.LecturerUpdateRequest;
 import com.mymatch.dto.response.lecturer.LecturerResponse;
@@ -7,12 +14,6 @@ import com.mymatch.entity.Campus;
 import com.mymatch.entity.Lecturer;
 import com.mymatch.entity.Review;
 import com.mymatch.entity.Tag;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-
-import java.util.List;
 
 @Mapper(
         componentModel = "spring",
@@ -42,6 +43,5 @@ public interface LecturerMapper {
     @Mapping(target = "name", source = "request.name")
     @Mapping(target = "code", source = "request.code")
     @Mapping(target = "bio", source = "request.bio")
-    void update(@MappingTarget Lecturer lecturer, LecturerUpdateRequest request,
-                Campus campus, List<Tag> tags);
+    void update(@MappingTarget Lecturer lecturer, LecturerUpdateRequest request, Campus campus, List<Tag> tags);
 }

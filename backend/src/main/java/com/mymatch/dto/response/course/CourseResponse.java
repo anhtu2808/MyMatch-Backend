@@ -1,6 +1,5 @@
 package com.mymatch.dto.response.course;
 
-import com.mymatch.dto.response.university.UniversityResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

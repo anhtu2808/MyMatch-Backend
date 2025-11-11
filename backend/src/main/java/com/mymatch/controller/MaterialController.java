@@ -1,5 +1,14 @@
 package com.mymatch.controller;
 
+import java.nio.charset.StandardCharsets;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.material.MaterialCreationRequest;
 import com.mymatch.dto.request.material.MaterialFilter;
 import com.mymatch.dto.request.material.MaterialUpdateRequest;
@@ -8,19 +17,10 @@ import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.filemanager.FileDownloadResponse;
 import com.mymatch.dto.response.material.MaterialResponse;
 import com.mymatch.service.MaterialService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/materials")
@@ -31,8 +31,8 @@ public class MaterialController {
     MaterialService materialService;
 
     @PostMapping
-    public ApiResponse<MaterialResponse> createMaterial(
-            @ModelAttribute @Valid MaterialCreationRequest request) throws Exception {
+    public ApiResponse<MaterialResponse> createMaterial(@ModelAttribute @Valid MaterialCreationRequest request)
+            throws Exception {
         return ApiResponse.<MaterialResponse>builder()
                 .result(materialService.createMaterial(request))
                 .build();
@@ -47,8 +47,7 @@ public class MaterialController {
 
     @PutMapping("/{id}")
     public ApiResponse<MaterialResponse> updateMaterial(
-            @PathVariable Long id,
-            @RequestBody @Valid MaterialUpdateRequest request) {
+            @PathVariable Long id, @RequestBody @Valid MaterialUpdateRequest request) {
         return ApiResponse.<MaterialResponse>builder()
                 .result(materialService.updateMaterial(id, request))
                 .build();
@@ -78,14 +77,14 @@ public class MaterialController {
         FileDownloadResponse downloadInfo = materialService.downloadMaterial(materialId);
 
         ContentDisposition contentDisposition = ContentDisposition.attachment()
-                                                                  .filename(downloadInfo.getFileName(), StandardCharsets.UTF_8)
-                                                                  .build();
+                .filename(downloadInfo.getFileName(), StandardCharsets.UTF_8)
+                .build();
 
         return ResponseEntity.ok()
-                             .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
-                             .header(HttpHeaders.CONTENT_TYPE, downloadInfo.getContentType())
-                             .header("X-Accel-Redirect", downloadInfo.getNginxPath())
-                             .build();
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .header(HttpHeaders.CONTENT_TYPE, downloadInfo.getContentType())
+                .header("X-Accel-Redirect", downloadInfo.getNginxPath())
+                .build();
     }
 
     @DeleteMapping("/{id}")

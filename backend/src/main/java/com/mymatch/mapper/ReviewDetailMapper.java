@@ -1,12 +1,13 @@
 package com.mymatch.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+
 import com.mymatch.dto.request.reviewdetail.ReviewDetailRequest;
 import com.mymatch.dto.response.review.ReviewResponse;
 import com.mymatch.entity.ReviewCriteria;
 import com.mymatch.entity.ReviewDetail;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
         componentModel = "spring",

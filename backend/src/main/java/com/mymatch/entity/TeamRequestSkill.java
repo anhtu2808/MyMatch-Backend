@@ -1,7 +1,9 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
 import jakarta.persistence.*;
+
+import com.mymatch.common.AbstractAuditingEntity;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

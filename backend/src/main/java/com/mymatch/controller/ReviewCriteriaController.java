@@ -1,18 +1,20 @@
 package com.mymatch.controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaCreateRequest;
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaFilter;
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaUpdateRequest;
 import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.reviewcriteria.ReviewCriteriaResponse;
 import com.mymatch.service.ReviewCriteriaService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/review-criteria")
@@ -42,8 +44,8 @@ public class ReviewCriteriaController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<ReviewCriteriaResponse> updateReviewCriteria(@PathVariable Long id,
-                                                                    @RequestBody ReviewCriteriaUpdateRequest req) {
+    public ApiResponse<ReviewCriteriaResponse> updateReviewCriteria(
+            @PathVariable Long id, @RequestBody ReviewCriteriaUpdateRequest req) {
         return ApiResponse.<ReviewCriteriaResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Cập nhật tiêu chí đánh giá thành công")

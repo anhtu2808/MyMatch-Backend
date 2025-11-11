@@ -1,19 +1,18 @@
 package com.mymatch.entity;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ThreadLocalRandom;
+
+import jakarta.persistence.*;
+
 import com.mymatch.common.AbstractAuditingEntity;
 import com.mymatch.enums.TransactionSource;
 import com.mymatch.enums.TransactionStatus;
 import com.mymatch.enums.TransactionType;
-import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @Setter
@@ -33,8 +32,10 @@ public class Transaction extends AbstractAuditingEntity {
 
     // Số tiền của giao dịch, luôn là số dương
     @Column(nullable = false)
-    Long coin;  // Số coin của transaction đơn vị (coin)
+    Long coin; // Số coin của transaction đơn vị (coin)
+
     Double amount; // Số tiền của transaction đơn vị (VND)
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     TransactionType type;
@@ -57,8 +58,7 @@ public class Transaction extends AbstractAuditingEntity {
     @PrePersist
     public void generateTransactionCode() {
         if (transactionCode == null || transactionCode.isEmpty()) {
-            String timestamp = ZonedDateTime.now()
-                    .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
+            String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
             int randomNumber = ThreadLocalRandom.current().nextInt(1000, 10000);
             long nano = System.nanoTime();
             this.transactionCode = timestamp + randomNumber + nano;

@@ -1,4 +1,3 @@
 package com.mymatch.enums;
 
-public enum MaterialCategory {
-}
+public enum MaterialCategory {}

@@ -1,5 +1,7 @@
 package com.mymatch.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 
 import org.hibernate.annotations.SQLDelete;
@@ -9,8 +11,6 @@ import com.mymatch.common.AbstractAuditingEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -45,7 +45,6 @@ public class Lecturer extends AbstractAuditingEntity {
     @JoinTable(
             name = "lecturer_tags",
             joinColumns = @JoinColumn(name = "lecturer_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
     List<Tag> tags;
 }

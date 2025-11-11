@@ -3,6 +3,7 @@ package com.mymatch.dto.request.campus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,7 +19,6 @@ public class CampusCreationRequest {
 
     @NotBlank(message = "Address không được để trống")
     String address;
-
 
     String imgUrl;
 

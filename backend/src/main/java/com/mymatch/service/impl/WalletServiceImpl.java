@@ -1,5 +1,8 @@
 package com.mymatch.service.impl;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.mymatch.dto.request.wallet.WalletRequest;
 import com.mymatch.dto.response.transaction.TransactionResponse;
 import com.mymatch.dto.response.wallet.WalletResponse;
@@ -17,12 +20,11 @@ import com.mymatch.repository.WalletRepository;
 import com.mymatch.service.TransactionService;
 import com.mymatch.service.WalletService;
 import com.mymatch.utils.SecurityUtil;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -49,21 +51,22 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
-    public TransactionResponse topUpWallet(String code,Double amountVND) {
+    public TransactionResponse topUpWallet(String code, Double amountVND) {
         if (amountVND == null || amountVND <= 0) {
             throw new AppException(ErrorCode.INVALID_PARAMETER);
         }
-        Wallet wallet = walletRepository.findByCode(code)
-                .orElseThrow(() -> new AppException(ErrorCode.WALLET_NOT_FOUND));
+        Wallet wallet =
+                walletRepository.findByCode(code).orElseThrow(() -> new AppException(ErrorCode.WALLET_NOT_FOUND));
 
         long coinAmount = (long) (amountVND / EXCHANGE_RATE);
 
         Transaction transaction = transactionService.initiateTransaction(
-                wallet, coinAmount, amountVND,
+                wallet,
+                coinAmount,
+                amountVND,
                 TransactionType.IN,
                 TransactionSource.TOP_UP,
-                "Người dùng yêu cầu nạp " + amountVND + " VND"
-        );
+                "Người dùng yêu cầu nạp " + amountVND + " VND");
         try {
             wallet.setCoin(wallet.getCoin() + coinAmount);
             walletRepository.save(wallet);
@@ -76,7 +79,6 @@ public class WalletServiceImpl implements WalletService {
         return transactionMapper.toResponse(transaction);
     }
 
-
     @Override
     @Transactional
     public Transaction addToCoinWallet(WalletRequest request) {
@@ -84,10 +86,15 @@ public class WalletServiceImpl implements WalletService {
         Long coinAmount = request.getCoin();
         wallet.setCoin(wallet.getCoin() + coinAmount);
         walletRepository.save(wallet);
-        Transaction transaction = transactionService.initiateTransaction(wallet, coinAmount, null, TransactionType.IN, request.getSource(), request.getDescription());
+        Transaction transaction = transactionService.initiateTransaction(
+                wallet, coinAmount, null, TransactionType.IN, request.getSource(), request.getDescription());
         transactionService.markAsCompleted(transaction);
 
-        log.info("Added {} coins to wallet of user {}. Source: {}", coinAmount, wallet.getUser().getId(), request.getSource());
+        log.info(
+                "Added {} coins to wallet of user {}. Source: {}",
+                coinAmount,
+                wallet.getUser().getId(),
+                request.getSource());
         return transaction;
     }
 
@@ -106,14 +113,14 @@ public class WalletServiceImpl implements WalletService {
 
         wallet.setCoin(balanceAfter);
         walletRepository.save(wallet);
-        Transaction transaction = transactionService.initiateTransaction(wallet, coinAmount, null, TransactionType.OUT, request.getSource(), request.getDescription());
+        Transaction transaction = transactionService.initiateTransaction(
+                wallet, coinAmount, null, TransactionType.OUT, request.getSource(), request.getDescription());
         transactionService.markAsCompleted(transaction);
         return transaction;
     }
 
     private User getUser(Long userId) {
 
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 }

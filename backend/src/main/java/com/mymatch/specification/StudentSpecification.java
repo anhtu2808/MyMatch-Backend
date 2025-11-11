@@ -1,12 +1,14 @@
 package com.mymatch.specification;
 
-import com.mymatch.dto.request.student.StudentFilterRequest;
-import com.mymatch.entity.Student;
-import org.springframework.data.jpa.domain.Specification;
-
-import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.criteria.Predicate;
+
+import org.springframework.data.jpa.domain.Specification;
+
+import com.mymatch.dto.request.student.StudentFilterRequest;
+import com.mymatch.entity.Student;
 
 public class StudentSpecification {
     public static Specification<Student> withFilter(StudentFilterRequest f) {

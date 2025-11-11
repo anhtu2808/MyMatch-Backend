@@ -1,14 +1,16 @@
 package com.mymatch.specification;
 
-import com.mymatch.dto.request.purchase.UserPurchaseFilterRequest;
-import com.mymatch.entity.UserPurchase;
-import com.mymatch.enums.PurchaseStatus;
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.data.jpa.domain.Specification;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.criteria.Predicate;
+
+import org.springframework.data.jpa.domain.Specification;
+
+import com.mymatch.dto.request.purchase.UserPurchaseFilterRequest;
+import com.mymatch.entity.UserPurchase;
+import com.mymatch.enums.PurchaseStatus;
 
 public class UserPurchaseSpecification {
 

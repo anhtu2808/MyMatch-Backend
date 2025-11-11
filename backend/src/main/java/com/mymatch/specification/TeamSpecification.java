@@ -1,8 +1,9 @@
 package com.mymatch.specification;
 
+import org.springframework.data.jpa.domain.Specification;
+
 import com.mymatch.dto.request.team.TeamFilterRequest;
 import com.mymatch.entity.Team;
-import org.springframework.data.jpa.domain.Specification;
 
 public class TeamSpecification {
     public static Specification<Team> byFilter(TeamFilterRequest f) {
@@ -22,10 +23,11 @@ public class TeamSpecification {
             }
             if (f.getKeyword() != null && !f.getKeyword().isBlank()) {
                 var like = "%" + f.getKeyword().toLowerCase() + "%";
-                p = cb.and(p, cb.or(
-                        cb.like(cb.lower(root.get("name")), like),
-                        cb.like(cb.lower(root.get("description")), like)
-                ));
+                p = cb.and(
+                        p,
+                        cb.or(
+                                cb.like(cb.lower(root.get("name")), like),
+                                cb.like(cb.lower(root.get("description")), like)));
             }
             return p;
         };

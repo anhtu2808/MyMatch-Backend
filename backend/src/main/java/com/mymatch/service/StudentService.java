@@ -1,10 +1,11 @@
 package com.mymatch.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.mymatch.dto.request.student.StudentFilterRequest;
 import com.mymatch.dto.request.student.StudentUpdateRequest;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.student.StudentResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface StudentService {
 

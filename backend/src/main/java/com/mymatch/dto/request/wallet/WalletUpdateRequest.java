@@ -3,8 +3,6 @@ package com.mymatch.dto.request.wallet;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,5 +10,4 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WalletUpdateRequest {
     Long coin;
-
 }

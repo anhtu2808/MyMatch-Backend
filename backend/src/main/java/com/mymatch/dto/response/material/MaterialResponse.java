@@ -1,13 +1,14 @@
 package com.mymatch.dto.response.material;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.mymatch.dto.response.course.CourseResponse;
 import com.mymatch.dto.response.lecturer.LecturerResponse;
 import com.mymatch.dto.response.user.UserResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder

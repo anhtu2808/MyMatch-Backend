@@ -1,16 +1,16 @@
 package com.mymatch.mapper;
 
-import com.mymatch.dto.response.lecturercourse.LecturerCourseResponse;
-import com.mymatch.entity.LecturerCourse;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import java.util.List;
+import com.mymatch.dto.response.lecturercourse.LecturerCourseResponse;
+import com.mymatch.entity.LecturerCourse;
 
-@Mapper(
-        componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface LecturerCourseMapper {
     LecturerCourseResponse toResponse(LecturerCourse lecturerCourse);
+
     List<LecturerCourseResponse> toResponseList(List<LecturerCourse> lecturerCourses);
 }

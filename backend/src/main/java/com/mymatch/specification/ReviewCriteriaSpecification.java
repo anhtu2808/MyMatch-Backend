@@ -1,8 +1,9 @@
 package com.mymatch.specification;
 
+import org.springframework.data.jpa.domain.Specification;
+
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaFilter;
 import com.mymatch.entity.ReviewCriteria;
-import org.springframework.data.jpa.domain.Specification;
 
 public class ReviewCriteriaSpecification {
 
@@ -16,8 +17,7 @@ public class ReviewCriteriaSpecification {
             }
 
             if (filter.getType() != null) {
-                spec = spec.and((r, q, b) ->
-                        b.equal(r.get("type"), filter.getType()));
+                spec = spec.and((r, q, b) -> b.equal(r.get("type"), filter.getType()));
             }
 
             return spec.toPredicate(root, query, cb);

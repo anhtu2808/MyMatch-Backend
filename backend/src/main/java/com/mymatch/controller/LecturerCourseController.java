@@ -1,18 +1,21 @@
 package com.mymatch.controller;
 
+import static lombok.AccessLevel.PRIVATE;
+
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.lecturercourse.LecturerCourseCreationRequest;
 import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.lecturercourse.LecturerCourseResponse;
 import com.mymatch.service.LecturerCourseService;
-import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static lombok.AccessLevel.PRIVATE;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,9 +27,7 @@ public class LecturerCourseController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<LecturerCourseResponse> assign(
-            @Valid @RequestBody LecturerCourseCreationRequest req
-    ) {
+    public ApiResponse<LecturerCourseResponse> assign(@Valid @RequestBody LecturerCourseCreationRequest req) {
         return ApiResponse.<LecturerCourseResponse>builder()
                 .code(HttpStatus.CREATED.value())
                 .message("Gán môn học cho giảng viên thành công")
@@ -35,9 +36,7 @@ public class LecturerCourseController {
     }
 
     @GetMapping("/lecturers/{lecturerId}")
-    public ApiResponse<List<LecturerCourseResponse>> getByLecturerId(
-            @PathVariable Long lecturerId
-    ) {
+    public ApiResponse<List<LecturerCourseResponse>> getByLecturerId(@PathVariable Long lecturerId) {
         return ApiResponse.<List<LecturerCourseResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Lấy danh sách môn giảng dạy theo giảng viên thành công")

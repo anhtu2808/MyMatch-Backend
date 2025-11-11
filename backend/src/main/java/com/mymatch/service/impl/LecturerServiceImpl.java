@@ -1,5 +1,14 @@
 package com.mymatch.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.mymatch.dto.request.lecturer.LecturerCreationRequest;
 import com.mymatch.dto.request.lecturer.LecturerFilterRequest;
 import com.mymatch.dto.request.lecturer.LecturerUpdateRequest;
@@ -17,18 +26,11 @@ import com.mymatch.repository.TagRepository;
 import com.mymatch.service.LecturerService;
 import com.mymatch.specification.LecturerSpecification;
 import com.mymatch.utils.SecurityUtil;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -41,10 +43,10 @@ public class LecturerServiceImpl implements LecturerService {
     CampusRepository campusRepository;
     LecturerMapper lecturerMapper;
 
-
     @Override
     public LecturerResponse createLecturer(LecturerCreationRequest request) {
-        Campus campus = campusRepository.findById(request.getCampusId())
+        Campus campus = campusRepository
+                .findById(request.getCampusId())
                 .orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
         boolean isExist = lecturerRepository.existsByCodeAndCampus(request.getCode(), campus);
         if (isExist) {
@@ -57,22 +59,22 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public LecturerResponse getById(Long id) {
-        Lecturer lecturer = lecturerRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
+        Lecturer lecturer =
+                lecturerRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
         int reviewCount = lecturer.getReviews() != null ? lecturer.getReviews().size() : 0;
         return lecturerMapper.toLecturerResponse(lecturer, lecturer.getReviews(), reviewCount);
     }
-
 
     @Override
     public LecturerResponse updateLecturer(Long id, LecturerUpdateRequest request) {
         Campus campus = null;
         if (request.getCampusId() != null) {
-            campus = campusRepository.findById(request.getCampusId())
+            campus = campusRepository
+                    .findById(request.getCampusId())
                     .orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
         }
-        Lecturer lecturer = lecturerRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
+        Lecturer lecturer =
+                lecturerRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
         List<Tag> tags = tagRepository.findByIdIn(request.getTagIds());
         lecturerMapper.update(lecturer, request, campus, tags);
         int reviewCount = lecturer.getReviews() != null ? lecturer.getReviews().size() : 0;
@@ -81,22 +83,18 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public void deleteLecturer(Long id) {
-        Lecturer lecturer = lecturerRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
+        Lecturer lecturer =
+                lecturerRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
         lecturerRepository.delete(lecturer);
     }
 
     @Override
-    public PageResponse<LecturerResponse> getAllLecturers(LecturerFilterRequest filter, int page, int size, String sortBy) {
-        Sort.Direction direction = Sort.Direction.fromOptionalString(sortBy)
-                .orElse(Sort.Direction.DESC);
+    public PageResponse<LecturerResponse> getAllLecturers(
+            LecturerFilterRequest filter, int page, int size, String sortBy) {
+        Sort.Direction direction = Sort.Direction.fromOptionalString(sortBy).orElse(Sort.Direction.DESC);
         Sort sort = Sort.by(direction, (sortBy != null && !sortBy.isBlank()) ? sortBy : "createAt");
 
-        Pageable pageable = PageRequest.of(
-                page - 1,
-                size,
-                sort);
-
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         var spec = LecturerSpecification.buildSpec(filter);
         Page<Lecturer> pages;
@@ -108,7 +106,8 @@ public class LecturerServiceImpl implements LecturerService {
         }
         List<LecturerResponse> lecturerResponses = new ArrayList<>();
         for (Lecturer lecturer : pages.getContent()) {
-            int reviewCount = lecturer.getReviews() != null ? lecturer.getReviews().size() : 0;
+            int reviewCount =
+                    lecturer.getReviews() != null ? lecturer.getReviews().size() : 0;
             LecturerResponse response = lecturerMapper.toLecturerResponse(lecturer, null, reviewCount);
             lecturerResponses.add(response);
         }
@@ -121,6 +120,4 @@ public class LecturerServiceImpl implements LecturerService {
                 .currentPage(page)
                 .build();
     }
-
-
 }

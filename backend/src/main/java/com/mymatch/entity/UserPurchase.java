@@ -1,14 +1,17 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
-import com.mymatch.enums.PurchaseStatus;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
+import com.mymatch.common.AbstractAuditingEntity;
+import com.mymatch.enums.PurchaseStatus;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -41,7 +44,7 @@ public class UserPurchase extends AbstractAuditingEntity {
     LocalDateTime expiryDate;
 
     @Column(nullable = false)
-    Long costCoin;                 // snapshot giá tại thời điểm mua (đồng bộ với Plan.coin hiện tại)
+    Long costCoin; // snapshot giá tại thời điểm mua (đồng bộ với Plan.coin hiện tại)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

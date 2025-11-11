@@ -1,10 +1,11 @@
 package com.mymatch.dto.request.wallet;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.math.BigDecimal;
 
 @Data
 @Builder

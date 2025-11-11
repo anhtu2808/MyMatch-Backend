@@ -1,5 +1,14 @@
 package com.mymatch.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.mymatch.dto.request.course.CourseCreationRequest;
 import com.mymatch.dto.request.course.CourseFilterRequest;
 import com.mymatch.dto.request.course.CourseUpdateRequest;
@@ -14,18 +23,11 @@ import com.mymatch.repository.CourseRepository;
 import com.mymatch.repository.UniversityRepository;
 import com.mymatch.service.CourseService;
 import com.mymatch.specification.CourseSpecification;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -39,8 +41,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseResponse createCourse(CourseCreationRequest req) {
-        University university = universityRepository.findById(req.getUniversityId())
-                                                    .orElseThrow(() -> new AppException(ErrorCode.UNIVERSITY_NOT_FOUND));
+        University university = universityRepository
+                .findById(req.getUniversityId())
+                .orElseThrow(() -> new AppException(ErrorCode.UNIVERSITY_NOT_FOUND));
 
         boolean isExisted = courseRepository.existsByCodeAndUniversity(req.getCode(), university);
         if (isExisted) {
@@ -54,16 +57,14 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseResponse getById(Long id) {
-        Course course = courseRepository.findById(id)
-                                        .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Course course = courseRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         return courseMapper.toCourseResponse(course);
     }
 
     @Override
     public CourseResponse updateCourse(Long id, CourseUpdateRequest request) {
 
-        Course course = courseRepository.findById(id)
-                                        .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Course course = courseRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
         courseMapper.update(course, request);
         course = courseRepository.save(course);
@@ -72,18 +73,13 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(Long id) {
-        Course course = courseRepository.findById(id)
-                                        .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Course course = courseRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         courseRepository.delete(course);
     }
 
     @Override
     public PageResponse<CourseResponse> getAllCourses(CourseFilterRequest filter, int page, int size, String sort) {
-        Pageable pageable = PageRequest.of(
-                page - 1,
-                size,
-                Sort.by(sort == null ? "name" : sort)
-        );
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(sort == null ? "name" : sort));
 
         var spec = CourseSpecification.buildSpec(filter);
         Page<Course> pages = courseRepository.findAll(spec, pageable);

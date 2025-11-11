@@ -1,8 +1,8 @@
 package com.mymatch.service;
 
-import com.mymatch.dto.response.semester.SemesterResponse;
-
 import java.util.List;
+
+import com.mymatch.dto.response.semester.SemesterResponse;
 
 public interface SemesterService {
     List<SemesterResponse> getSemestersByUniversityId(Long universityId);

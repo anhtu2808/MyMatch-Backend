@@ -1,12 +1,13 @@
 package com.mymatch.service;
 
+import java.util.List;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaCreateRequest;
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaFilter;
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaUpdateRequest;
 import com.mymatch.dto.response.reviewcriteria.ReviewCriteriaResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import java.util.List;
 
 public interface ReviewCriteriaService {
 
@@ -22,5 +23,4 @@ public interface ReviewCriteriaService {
 
     @PreAuthorize("hasAuthority('reviewcriteria:delete')")
     void deleteReviewCriteria(Long id);
-
 }

@@ -1,5 +1,7 @@
 package com.mymatch.service;
 
+import java.text.ParseException;
+
 import com.mymatch.dto.request.auth.AuthenticationRequest;
 import com.mymatch.dto.request.auth.IntrospectRequest;
 import com.mymatch.dto.request.auth.LogoutRequest;
@@ -7,8 +9,6 @@ import com.mymatch.dto.request.auth.RefreshRequest;
 import com.mymatch.dto.response.auth.AuthenticationResponse;
 import com.mymatch.dto.response.auth.IntrospectResponse;
 import com.nimbusds.jose.JOSEException;
-
-import java.text.ParseException;
 
 public interface AuthenticationService {
     /**
@@ -41,5 +41,6 @@ public interface AuthenticationService {
      * @throws JOSEException if token verification fails
      */
     AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException;
+
     AuthenticationResponse outboundAuthenticate(String code, String redirectUri);
 }

@@ -1,10 +1,11 @@
 package com.mymatch.dto.response.campus;
 
+import java.time.LocalDateTime;
+
 import com.mymatch.dto.response.university.UniversityResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder

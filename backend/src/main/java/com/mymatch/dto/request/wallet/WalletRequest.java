@@ -1,8 +1,8 @@
 package com.mymatch.dto.request.wallet;
 
-
 import com.mymatch.enums.TransactionSource;
 import com.mymatch.enums.TransactionType;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

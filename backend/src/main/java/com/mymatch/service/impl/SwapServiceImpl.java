@@ -1,5 +1,16 @@
 package com.mymatch.service.impl;
 
+import static com.mymatch.utils.SecurityUtil.hasAuthority;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 import com.mymatch.dto.request.swap.*;
 import com.mymatch.dto.response.PageResponse;
@@ -18,22 +29,11 @@ import com.mymatch.repository.*;
 import com.mymatch.service.SwapService;
 import com.mymatch.specification.SwapSpecification;
 import com.mymatch.utils.SecurityUtil;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.transaction.Transactional;
+
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.AccessLevel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
-import static com.mymatch.utils.SecurityUtil.hasAuthority;
 
 @Slf4j
 @Service
@@ -46,10 +46,13 @@ public class SwapServiceImpl implements SwapService {
     SwapMapper swapMapper;
     SwapRequestMapper swapRequestMapper;
     StudentMapper studentMapper;
+
     @Override
-    public void createSwap(SwapRequest swapRequestCurrent , SwapRequest existingSwapRequest) {
-        log.info("Creating swap between SwapRequest ID {} and SwapRequest ID {}",
-                swapRequestCurrent.getId(), existingSwapRequest.getId());
+    public void createSwap(SwapRequest swapRequestCurrent, SwapRequest existingSwapRequest) {
+        log.info(
+                "Creating swap between SwapRequest ID {} and SwapRequest ID {}",
+                swapRequestCurrent.getId(),
+                existingSwapRequest.getId());
         Swap swap = Swap.builder()
                 .requestFrom(existingSwapRequest)
                 .requestTo(swapRequestCurrent)
@@ -63,7 +66,7 @@ public class SwapServiceImpl implements SwapService {
         if (swapRepository.existsByPairEitherOrder(swapRequestCurrent.getId(), existingSwapRequest.getId())) {
             throw new AppException(ErrorCode.SWAP_ALREADY_EXISTS);
         }
-            swapRepository.save(swap);
+        swapRepository.save(swap);
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
@@ -74,7 +77,8 @@ public class SwapServiceImpl implements SwapService {
         // Xác định viewerId: nếu không có quyền swap:read thì phải filter theo student hiện tại
         final Long viewerId;
         if (!hasAuthority("swap:read")) {
-            User currentUser = userRepository.findById(SecurityUtil.getCurrentUserId())
+            User currentUser = userRepository
+                    .findById(SecurityUtil.getCurrentUserId())
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
             Student student = currentUser.getStudent();
@@ -84,9 +88,8 @@ public class SwapServiceImpl implements SwapService {
             viewerId = student.getId();
 
             // Apply filter: chỉ lấy swap mà user hiện tại là studentFrom hoặc studentTo
-            spec = spec.and((root, q, cb) -> cb.or(
-                    cb.equal(root.get("studentFrom").get("id"), viewerId)
-            ));
+            spec = spec.and(
+                    (root, q, cb) -> cb.or(cb.equal(root.get("studentFrom").get("id"), viewerId)));
         } else {
             viewerId = null; // Admin/staff có quyền xem tất cả
         }
@@ -111,21 +114,22 @@ public class SwapServiceImpl implements SwapService {
                 .currentPage(req.getPage())
                 .build();
     }
+
     public SwapResponse getById(Long id) {
         Swap swap = new Swap();
         if (!hasAuthority("swap:read")) {
-            Long studentId = userRepository.findById(SecurityUtil.getCurrentUserId())
+            Long studentId = userRepository
+                    .findById(SecurityUtil.getCurrentUserId())
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND))
                     .getStudent()
                     .getId();
 
-            swap = swapRepository.findByIdAndStudentFromIdOrStudentToId(id, studentId, studentId)
+            swap = swapRepository
+                    .findByIdAndStudentFromIdOrStudentToId(id, studentId, studentId)
                     .orElseThrow(() -> new AppException(ErrorCode.SWAP_NOT_FOUND));
-           return toViewerResponse(swap, studentId);
-        }
-        else{
-            swap = swapRepository.findById(id)
-                    .orElseThrow(() -> new AppException(ErrorCode.SWAP_NOT_FOUND));
+            return toViewerResponse(swap, studentId);
+        } else {
+            swap = swapRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SWAP_NOT_FOUND));
         }
         return swapMapper.toResponse(swap);
     }
@@ -133,7 +137,8 @@ public class SwapServiceImpl implements SwapService {
     @Override
     public SwapResponse updateDecision(Long swapId, SwapUpdateRequest req) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
-        Student currentStudent = userRepository.findById(currentUserId)
+        Student currentStudent = userRepository
+                .findById(currentUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND))
                 .getStudent();
 
@@ -142,8 +147,7 @@ public class SwapServiceImpl implements SwapService {
         }
 
         // Get Swap
-        Swap swap = swapRepository.findById(swapId)
-                .orElseThrow(() -> new AppException(ErrorCode.SWAP_NOT_FOUND));
+        Swap swap = swapRepository.findById(swapId).orElseThrow(() -> new AppException(ErrorCode.SWAP_NOT_FOUND));
 
         // Check Swap is PENDING
         if (swap.getStatus() != SwapStatus.PENDING) {
@@ -151,8 +155,10 @@ public class SwapServiceImpl implements SwapService {
         }
 
         // Check current user is studentFrom or studentTo
-        boolean iAmFrom = Objects.equals(currentStudent.getId(), swap.getStudentFrom().getId());
-        boolean iAmTo = Objects.equals(currentStudent.getId(), swap.getStudentTo().getId());
+        boolean iAmFrom =
+                Objects.equals(currentStudent.getId(), swap.getStudentFrom().getId());
+        boolean iAmTo =
+                Objects.equals(currentStudent.getId(), swap.getStudentTo().getId());
 
         // Validation: User must be either studentFrom or studentTo
         if (!iAmFrom && !iAmTo) {
@@ -179,10 +185,11 @@ public class SwapServiceImpl implements SwapService {
             rejectSwapAndRetainRequests(swap);
         }
 
-
         return toViewerResponse(swap, currentStudent.getId());
     }
-    private void updateUserDecision(Swap swap, boolean iAmFrom, SwapDecision decision, String reason) {        if (iAmFrom && swap.getFromDecision() == decision) return;
+
+    private void updateUserDecision(Swap swap, boolean iAmFrom, SwapDecision decision, String reason) {
+        if (iAmFrom && swap.getFromDecision() == decision) return;
         if (!iAmFrom && swap.getToDecision() == decision) return;
 
         if (iAmFrom) swap.setFromDecision(decision);
@@ -192,6 +199,7 @@ public class SwapServiceImpl implements SwapService {
             swap.setReason(reason);
         }
     }
+
     private SwapStatus computeSwapOutcome(SwapDecision from, SwapDecision to) {
         if (from == SwapDecision.ACCEPTED && to == SwapDecision.ACCEPTED) {
             return SwapStatus.APPROVED;
@@ -201,13 +209,15 @@ public class SwapServiceImpl implements SwapService {
         }
         return SwapStatus.PENDING;
     }
+
     private void applyOutcomeAndSyncRequests(Swap swap, SwapStatus outcome) {
         switch (outcome) {
-            case PENDING -> swapRepository.save(swap);  // Rare in this API, but safe
+            case PENDING -> swapRepository.save(swap); // Rare in this API, but safe
             case APPROVED -> approveSwapAndArchiveRequests(swap);
             case REJECTED -> rejectSwapAndRetainRequests(swap);
         }
     }
+
     private void approveSwapAndArchiveRequests(Swap swap) {
         swap.setStatus(SwapStatus.APPROVED);
         swap.setMatchedAt(LocalDateTime.now());
@@ -225,7 +235,7 @@ public class SwapServiceImpl implements SwapService {
     private void rejectSwapAndRetainRequests(Swap swap) {
         swap.setStatus(SwapStatus.REJECTED);
         swapRepository.save(swap);
-        log.info("Swap {} rejected; requests retained for matching", swap.getId());  // Optional audit log
+        log.info("Swap {} rejected; requests retained for matching", swap.getId()); // Optional audit log
     }
 
     private SwapResponse toViewerResponse(Swap s, Long viewerId) {
@@ -233,15 +243,15 @@ public class SwapServiceImpl implements SwapService {
 
         // Chọn đúng “from/to” theo NGƯỜI ĐANG XEM
         var reqFrom = iAmFrom ? s.getRequestFrom() : s.getRequestTo();
-        var reqTo   = iAmFrom ? s.getRequestTo()   : s.getRequestFrom();
+        var reqTo = iAmFrom ? s.getRequestTo() : s.getRequestFrom();
         var stuFrom = iAmFrom ? s.getStudentFrom() : s.getStudentTo();
-        var stuTo   = iAmFrom ? s.getStudentTo()   : s.getStudentFrom();
+        var stuTo = iAmFrom ? s.getStudentTo() : s.getStudentFrom();
 
         // Map entity -> DTO bằng mapper
         var reqFromDto = (reqFrom != null) ? swapRequestMapper.toResponse(reqFrom) : null;
-        var reqToDto   = (reqTo   != null) ? swapRequestMapper.toResponse(reqTo)   : null;
-        var stuFromDto = (stuFrom != null) ? studentMapper.toResponse(stuFrom)     : null;
-        var stuToDto   = (stuTo   != null) ? studentMapper.toResponse(stuTo)       : null;
+        var reqToDto = (reqTo != null) ? swapRequestMapper.toResponse(reqTo) : null;
+        var stuFromDto = (stuFrom != null) ? studentMapper.toResponse(stuFrom) : null;
+        var stuToDto = (stuTo != null) ? studentMapper.toResponse(stuTo) : null;
 
         return SwapResponse.builder()
                 .id(s.getId())
@@ -255,8 +265,7 @@ public class SwapServiceImpl implements SwapService {
                 .updateAt(s.getUpdateAt())
                 // “Quyết định của tôi” phải hiện ở fromDecision trong góc nhìn của tôi
                 .fromDecision(iAmFrom ? s.getFromDecision() : s.getToDecision())
-                .toDecision(iAmFrom ? s.getToDecision()   : s.getFromDecision())
+                .toDecision(iAmFrom ? s.getToDecision() : s.getFromDecision())
                 .build();
     }
-
 }

@@ -1,12 +1,14 @@
 package com.mymatch.specification;
 
-import com.mymatch.dto.request.swaprequest.SwapRequestFilterRequest;
-import com.mymatch.entity.SwapRequest;
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.data.jpa.domain.Specification;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.criteria.Predicate;
+
+import org.springframework.data.jpa.domain.Specification;
+
+import com.mymatch.dto.request.swaprequest.SwapRequestFilterRequest;
+import com.mymatch.entity.SwapRequest;
 
 public class SwapRequestSpecification {
     public static Specification<SwapRequest> withFilter(SwapRequestFilterRequest f) {
@@ -43,14 +45,12 @@ public class SwapRequestSpecification {
             if (f.getStatuses() != null && !f.getStatuses().isEmpty()) {
                 predicates.add(root.get("status").in(f.getStatuses()));
             }
-            if(Boolean.FALSE.equals(f.getIncludeExpired())) {
-                predicates.add(
-                        cb.or(
-                                cb.greaterThan(root.get("expiresAt"), java.time.LocalDateTime.now()),
-                                cb.isNull(root.get("expiresAt"))
-                        )
-                );
-            };
+            if (Boolean.FALSE.equals(f.getIncludeExpired())) {
+                predicates.add(cb.or(
+                        cb.greaterThan(root.get("expiresAt"), java.time.LocalDateTime.now()),
+                        cb.isNull(root.get("expiresAt"))));
+            }
+            ;
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

@@ -1,13 +1,14 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
+import com.mymatch.common.AbstractAuditingEntity;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -38,5 +39,5 @@ public class Plan extends AbstractAuditingEntity {
     String imageUrl;
 
     @Column(nullable = false)
-    int durationDays;            // Số ngày hiệu lực
+    int durationDays; // Số ngày hiệu lực
 }

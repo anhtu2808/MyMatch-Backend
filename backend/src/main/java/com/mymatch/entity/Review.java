@@ -1,5 +1,7 @@
 package com.mymatch.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 
 import org.hibernate.annotations.SQLDelete;
@@ -9,8 +11,6 @@ import com.mymatch.common.AbstractAuditingEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -48,6 +48,7 @@ public class Review extends AbstractAuditingEntity {
     @Column(name = "verified", nullable = false)
     @Builder.Default
     Boolean isVerified = false;
+
     @Builder.Default
     Boolean isAnonymous = false;
 

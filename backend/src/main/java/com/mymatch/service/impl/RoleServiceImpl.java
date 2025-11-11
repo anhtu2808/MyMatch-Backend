@@ -1,24 +1,25 @@
 package com.mymatch.service.impl;
 
-import com.mymatch.dto.request.role.RoleCreationRequest;
+import java.util.HashSet;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.mymatch.dto.request.role.RoleUpdateRequest;
-import com.mymatch.exception.AppException;
 import com.mymatch.dto.response.role.RoleResponse;
 import com.mymatch.entity.Role;
-import com.mymatch.exception.ErrorCode;
 import com.mymatch.enums.RoleType;
+import com.mymatch.exception.AppException;
+import com.mymatch.exception.ErrorCode;
 import com.mymatch.mapper.RoleMapper;
 import com.mymatch.repository.PermissionRepository;
 import com.mymatch.repository.RoleRepository;
 import com.mymatch.service.RoleService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -36,7 +37,7 @@ public class RoleServiceImpl implements RoleService {
 
         if (request.getName() != null
                 && (roleRepository.existsByName(RoleType.valueOf(request.getName()))
-                && !existingRole.getName().equals(RoleType.valueOf(request.getName())))) {
+                        && !existingRole.getName().equals(RoleType.valueOf(request.getName())))) {
             throw new AppException(ErrorCode.ROLE_EXISTED);
         }
         var permissions = new HashSet<>(permissionRepository.findAllById(request.getPermissions()));

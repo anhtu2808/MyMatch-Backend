@@ -1,5 +1,20 @@
 package com.mymatch.service.impl;
 
+import static java.util.stream.Collectors.toSet;
+
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.mymatch.dto.request.auth.*;
 import com.mymatch.dto.response.auth.AuthenticationResponse;
 import com.mymatch.dto.response.auth.IntrospectResponse;
@@ -20,24 +35,12 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import jakarta.annotation.PostConstruct;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-
-import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Service
@@ -100,18 +103,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             jwt = verifyToken(token, false);
             Object claim = jwt.getJWTClaimsSet().getClaim("studentId");
             if (claim != null) {
-                studentId = (claim instanceof Number)
-                        ? ((Number) claim).longValue()
-                        : Long.valueOf(claim.toString());
+                studentId = (claim instanceof Number) ? ((Number) claim).longValue() : Long.valueOf(claim.toString());
             }
         } catch (AppException | JOSEException | ParseException e) {
             isValid = false;
         }
 
-        return IntrospectResponse.builder()
-                .studentId(studentId)
-                .valid(isValid)
-                .build();
+        return IntrospectResponse.builder().studentId(studentId).valid(isValid).build();
     }
 
     @Override
@@ -150,34 +148,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
         log.info("User Info {}", userInfo);
 
-        Role role = roleRepository.findByName(RoleType.STUDENT).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        Role role = roleRepository
+                .findByName(RoleType.STUDENT)
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
         // Onboard user
-        User user = userRepository.findByEmail(userInfo.getEmail())
-                .orElseGet(() -> {
-            Wallet wallet = Wallet.builder()
-                    .coin(0L)
-                    .build();
-                    String walletCode;
-                    do walletCode = codeUtil.randomBase();
-                    while (walletRepository.existsByCode(walletCode));
-                    wallet.setCode(walletCode);
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseGet(() -> {
+            Wallet wallet = Wallet.builder().coin(0L).build();
+            String walletCode;
+            do walletCode = codeUtil.randomBase();
+            while (walletRepository.existsByCode(walletCode));
+            wallet.setCode(walletCode);
             wallet = walletRepository.save(wallet);
             Student student = studentRepository.save(Student.builder().build());
             User newUser = userMapper.toUserFromGoogle(userInfo, role, wallet, student);
-                    notificationService.send(
-                            EmailType.WELCOME,
-                            newUser.getUsername().toString(),
-                            newUser.getEmail().toString(),
-                            Map.of("name", newUser.getUsername())
-                            );
+            notificationService.send(
+                    EmailType.WELCOME,
+                    newUser.getUsername().toString(),
+                    newUser.getEmail().toString(),
+                    Map.of("name", newUser.getUsername()));
             return userRepository.save(newUser);
         });
         // Generate token
         var token = generateToken(user);
         log.info("Generated token for user {}: {}", user.getUsername(), token);
-        return AuthenticationResponse.builder()
-                .token(token)
-                .build();
+        return AuthenticationResponse.builder().token(token).build();
     }
 
     @Override
@@ -241,7 +235,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .claim("userId", user.getId())
-                .claim("studentId", user.getStudent() != null ? user.getStudent().getId() : null)
+                .claim(
+                        "studentId",
+                        user.getStudent() != null ? user.getStudent().getId() : null)
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -264,11 +260,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Date expiryTime = (isRefresh)
                 ? new Date(signedJWT
-                .getJWTClaimsSet()
-                .getIssueTime()
-                .toInstant()
-                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
-                .toEpochMilli())
+                        .getJWTClaimsSet()
+                        .getIssueTime()
+                        .toInstant()
+                        .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
+                        .toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
@@ -295,6 +291,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         return stringJoiner.toString();
     }
+
     private String resolveRedirectUri(String incoming) {
         String candidate = (incoming != null && !incoming.isBlank()) ? incoming : REDIRECT_URI;
         if (!ALLOWED_REDIRECT_URIS.contains(candidate)) {
@@ -303,6 +300,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         return candidate;
     }
+
     @PostConstruct
     void initAllowedUris() {
         ALLOWED_REDIRECT_URIS = Arrays.stream(ALLOWED_REDIRECT_URIS_RAW.split(","))

@@ -1,4 +1,11 @@
 package com.mymatch.controller;
+
+import static lombok.AccessLevel.PRIVATE;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.studentrequest.StudentRequestCreationRequest;
 import com.mymatch.dto.request.studentrequest.StudentRequestFilterRequest;
 import com.mymatch.dto.request.studentrequest.StudentRequestUpdateRequest;
@@ -6,13 +13,9 @@ import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.studentrequest.StudentRequestResponse;
 import com.mymatch.service.StudentRequestService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import static lombok.AccessLevel.PRIVATE;
 
 @RestController
 @RequestMapping("/student-requests")
@@ -21,6 +24,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class StudentRequestController {
 
     StudentRequestService studentRequestService;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<StudentRequestResponse> createStudentRequest(
@@ -34,8 +38,7 @@ public class StudentRequestController {
 
     @PutMapping("/{id}")
     public ApiResponse<StudentRequestResponse> updateStudentRequest(
-            @PathVariable Long id,
-            @Validated @RequestBody StudentRequestUpdateRequest request) {
+            @PathVariable Long id, @Validated @RequestBody StudentRequestUpdateRequest request) {
         return ApiResponse.<StudentRequestResponse>builder()
                 .message("Cập nhật bài đăng tìm team thành công")
                 .result(studentRequestService.updateStudentRequest(id, request))

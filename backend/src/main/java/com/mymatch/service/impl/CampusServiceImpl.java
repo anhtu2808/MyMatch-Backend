@@ -1,5 +1,11 @@
 package com.mymatch.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+
 import com.mymatch.dto.request.campus.CampusCreationRequest;
 import com.mymatch.dto.request.campus.CampusUpdateRequest;
 import com.mymatch.dto.response.PageResponse;
@@ -12,14 +18,10 @@ import com.mymatch.mapper.CampusMapper;
 import com.mymatch.repository.CampusRepository;
 import com.mymatch.repository.UniversityRepository;
 import com.mymatch.service.CampusService;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,7 +35,8 @@ public class CampusServiceImpl implements CampusService {
 
     @Override
     public CampusResponse createCampus(CampusCreationRequest req) {
-        University uni = universityRepository.findById(req.getUniversityId())
+        University uni = universityRepository
+                .findById(req.getUniversityId())
                 .orElseThrow(() -> new AppException(ErrorCode.UNIVERSITY_NOT_FOUND));
 
         if (campusRepository.existsByNameAndUniversityId(req.getName(), req.getUniversityId()))
@@ -47,20 +50,19 @@ public class CampusServiceImpl implements CampusService {
 
     @Override
     public CampusResponse getById(Long id) {
-        var campus = campusRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
+        var campus = campusRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
         return campusMapper.toResponse(campus);
     }
 
     @Override
     public CampusResponse updateCampus(Long id, CampusUpdateRequest req) {
-        var campus = campusRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
+        var campus = campusRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
 
         campusMapper.update(campus, req);
 
         if (req.getUniversityId() != null) {
-            University uni = universityRepository.findById(req.getUniversityId())
+            University uni = universityRepository
+                    .findById(req.getUniversityId())
                     .orElseThrow(() -> new AppException(ErrorCode.UNIVERSITY_NOT_FOUND));
             campus.setUniversity(uni);
         }
@@ -71,8 +73,7 @@ public class CampusServiceImpl implements CampusService {
 
     @Override
     public CampusResponse deleteCampus(Long id) {
-        var campus = campusRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
+        var campus = campusRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
         campusRepository.delete(campus);
         return campusMapper.toResponse(campus);
     }
@@ -84,9 +85,8 @@ public class CampusServiceImpl implements CampusService {
 
         Page<Campus> pages = campusRepository.findAll(pageable);
 
-        List<CampusResponse> data = pages.getContent().stream()
-                .map(campusMapper::toResponse)
-                .collect(Collectors.toList());
+        List<CampusResponse> data =
+                pages.getContent().stream().map(campusMapper::toResponse).collect(Collectors.toList());
 
         return PageResponse.<CampusResponse>builder()
                 .data(data)

@@ -1,13 +1,16 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
+import java.util.List;
+
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.util.List;
+import com.mymatch.common.AbstractAuditingEntity;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -44,9 +47,11 @@ public class Material extends AbstractAuditingEntity {
 
     @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
     List<MaterialItem> items;
+
     Long price; // coin
 
     Double size;
+
     @Builder.Default
     int downloadCont = 0;
 

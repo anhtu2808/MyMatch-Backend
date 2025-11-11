@@ -1,8 +1,10 @@
 package com.mymatch.dto.request.reviewcriteria;
 
-import com.mymatch.enums.CriteriaType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import com.mymatch.enums.CriteriaType;
+
 import lombok.*;
 
 @Getter

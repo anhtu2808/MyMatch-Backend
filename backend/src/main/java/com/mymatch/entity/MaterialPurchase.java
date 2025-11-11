@@ -1,11 +1,14 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
+import com.mymatch.common.AbstractAuditingEntity;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -31,16 +34,14 @@ public class MaterialPurchase extends AbstractAuditingEntity {
     User buyer;
 
     @Column(nullable = false)
-    Long totalCoin;        // Tổng tiền
+    Long totalCoin; // Tổng tiền
 
     @Column(nullable = false)
-    Long platformFee;        // Phí platform
+    Long platformFee; // Phí platform
 
     @Column(nullable = false)
     Long ownerEarning;
 
     @Column(nullable = false)
     String transactionCode;
-
-
 }

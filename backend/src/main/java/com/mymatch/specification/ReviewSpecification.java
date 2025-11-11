@@ -1,15 +1,16 @@
 package com.mymatch.specification;
 
-import com.mymatch.dto.request.review.ReviewFilterRequest;
-import com.mymatch.entity.Review;
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.data.jpa.domain.Specification;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReviewSpecification {
+import jakarta.persistence.criteria.Predicate;
 
+import org.springframework.data.jpa.domain.Specification;
+
+import com.mymatch.dto.request.review.ReviewFilterRequest;
+import com.mymatch.entity.Review;
+
+public class ReviewSpecification {
 
     public static Specification<Review> byFilter(ReviewFilterRequest f) {
         return (root, query, cb) -> {

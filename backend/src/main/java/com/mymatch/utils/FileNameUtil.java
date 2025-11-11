@@ -25,8 +25,7 @@ public class FileNameUtil {
         String noAccent = normalized.replaceAll("\\p{M}", "");
 
         // Thay space thành "_", bỏ ký tự không hợp lệ
-        String safeName = noAccent.replaceAll("[^a-zA-Z0-9-_ ]", "")
-                                  .replaceAll(" ", "_");
+        String safeName = noAccent.replaceAll("[^a-zA-Z0-9-_ ]", "").replaceAll(" ", "_");
 
         // Nếu sau khi clean bị rỗng thì set default
         if (safeName.isEmpty()) {
@@ -36,4 +35,3 @@ public class FileNameUtil {
         return safeName + extPart;
     }
 }
-
