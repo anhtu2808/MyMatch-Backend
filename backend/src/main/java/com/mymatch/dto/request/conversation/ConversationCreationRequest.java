@@ -1,12 +1,14 @@
 package com.mymatch.dto.request.conversation;
 
-import com.mymatch.enums.ConversationType;
+import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import com.mymatch.enums.ConversationType;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @Builder

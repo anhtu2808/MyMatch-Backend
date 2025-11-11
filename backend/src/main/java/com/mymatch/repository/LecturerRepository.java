@@ -1,7 +1,6 @@
 package com.mymatch.repository;
 
-import com.mymatch.entity.Campus;
-import com.mymatch.entity.Lecturer;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +9,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import com.mymatch.entity.Campus;
+import com.mymatch.entity.Lecturer;
 
 public interface LecturerRepository extends JpaRepository<Lecturer, Long>, JpaSpecificationExecutor<Lecturer> {
     boolean existsByCodeAndCampus(String code, Campus campus);
@@ -19,5 +19,4 @@ public interface LecturerRepository extends JpaRepository<Lecturer, Long>, JpaSp
 
     @Query(value = "SELECT l FROM Lecturer l JOIN l.reviews r WHERE r.student.user.id = :userId")
     Page<Lecturer> findLecturersReviewedByUser(@Param("userId") Long userId, Pageable pageable);
-
 }

@@ -1,5 +1,10 @@
 package com.mymatch.service.impl;
 
+import java.io.InputStream;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.mymatch.dto.request.material.MaterialItemUploadRequest;
 import com.mymatch.dto.response.filemanager.FileDownloadResponse;
 import com.mymatch.dto.response.material.MaterialItemPreviewResponse;
@@ -15,14 +20,11 @@ import com.mymatch.service.FileManagerService;
 import com.mymatch.service.MaterialItemService;
 import com.mymatch.utils.FileNameUtil;
 import com.mymatch.utils.SecurityUtil;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.InputStream;
 
 @Slf4j
 @Service
@@ -34,10 +36,8 @@ public class MaterialItemServiceImpl implements MaterialItemService {
     MaterialItemMapper materialItemMapper;
     MaterialPurchaseRepository materialPurchaseRepository;
 
-    public MaterialItemPreviewResponse uploadMaterialItem(
-            MaterialItemUploadRequest request,
-            InputStream inputStream
-    ) throws Exception {
+    public MaterialItemPreviewResponse uploadMaterialItem(MaterialItemUploadRequest request, InputStream inputStream)
+            throws Exception {
         // Tính size bằng cách lấy từ MultipartFile (metadata), không cần đọc hết file
         Double fileSize = getFileSizeInMB(request.getFile());
         if (fileSize > 500.0) { // ví dụ limit 500MB
@@ -46,7 +46,8 @@ public class MaterialItemServiceImpl implements MaterialItemService {
 
         Long currentUserId = SecurityUtil.getCurrentUserId();
         String uuid = java.util.UUID.randomUUID().toString();
-        String safeFileName = FileNameUtil.sanitizeFileNameForStorage(request.getFile().getOriginalFilename());
+        String safeFileName =
+                FileNameUtil.sanitizeFileNameForStorage(request.getFile().getOriginalFilename());
 
         // Lưu file bằng streaming
         String fileUrl = fileManagerService.saveStream(
@@ -54,8 +55,7 @@ public class MaterialItemServiceImpl implements MaterialItemService {
                 safeFileName,
                 request.getFile().getContentType(),
                 buildFilePath(currentUserId, uuid),
-                StorageType.PRIVATE
-        );
+                StorageType.PRIVATE);
 
         MaterialItem materialItem = MaterialItem.builder()
                 .originalFileName(request.getFile().getOriginalFilename())
@@ -69,16 +69,15 @@ public class MaterialItemServiceImpl implements MaterialItemService {
         return materialItemMapper.toMaterialItemPreviewResponse(materialItem);
     }
 
-
     public FileDownloadResponse downloadMaterialItem(Long materialItemId) {
-        MaterialItem materialItem = materialItemRepository.findById(materialItemId)
-                                                          .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_ITEM_NOT_FOUND));
+        MaterialItem materialItem = materialItemRepository
+                .findById(materialItemId)
+                .orElseThrow(() -> new AppException(ErrorCode.MATERIAL_ITEM_NOT_FOUND));
         Long currentUserId = SecurityUtil.getCurrentUserId();
         Material material = materialItem.getMaterial();
         boolean isPurchased = false;
         if (material != null) {
-            isPurchased = materialPurchaseRepository
-                    .existsByMaterial_IdAndAndBuyer_Id(material.getId(), currentUserId);
+            isPurchased = materialPurchaseRepository.existsByMaterial_IdAndAndBuyer_Id(material.getId(), currentUserId);
             if (currentUserId.equals(material.getOwner().getId())) {
                 isPurchased = true;
             }
@@ -104,11 +103,8 @@ public class MaterialItemServiceImpl implements MaterialItemService {
         return Math.round(sizeInMB * 100.0) / 100.0; // làm tròn 2 số thập phân
     }
 
-
     private String buildFilePath(Long userId, String prefix) {
 
         return userId.toString() + "/" + prefix;
     }
-
-
 }

@@ -1,5 +1,9 @@
 package com.mymatch.service.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaCreateRequest;
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaFilter;
 import com.mymatch.dto.request.reviewcriteria.ReviewCriteriaUpdateRequest;
@@ -11,13 +15,11 @@ import com.mymatch.mapper.ReviewCriteriaMapper;
 import com.mymatch.repository.ReviewCriteriaRepository;
 import com.mymatch.service.ReviewCriteriaService;
 import com.mymatch.specification.ReviewCriteriaSpecification;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -30,15 +32,15 @@ public class ReviewCriteriaServiceImpl implements ReviewCriteriaService {
 
     @Override
     public List<ReviewCriteriaResponse> getAllReviewCriteria(ReviewCriteriaFilter filter) {
-        return reviewCriteriaRepository.findAll(ReviewCriteriaSpecification.filter(filter))
-                .stream()
+        return reviewCriteriaRepository.findAll(ReviewCriteriaSpecification.filter(filter)).stream()
                 .map(reviewCriteriaMapper::toResponse)
                 .toList();
     }
 
     @Override
     public ReviewCriteriaResponse getReviewCriteriaById(Long id) {
-        ReviewCriteria reviewCriteria = reviewCriteriaRepository.findById(id)
+        ReviewCriteria reviewCriteria = reviewCriteriaRepository
+                .findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_CRITERIA_NOT_FOUND));
         return reviewCriteriaMapper.toResponse(reviewCriteria);
     }
@@ -52,7 +54,8 @@ public class ReviewCriteriaServiceImpl implements ReviewCriteriaService {
 
     @Override
     public ReviewCriteriaResponse updateReviewCriteria(Long id, ReviewCriteriaUpdateRequest request) {
-        ReviewCriteria reviewCriteria = reviewCriteriaRepository.findById(id)
+        ReviewCriteria reviewCriteria = reviewCriteriaRepository
+                .findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_CRITERIA_NOT_FOUND));
 
         reviewCriteriaMapper.updateEntity(reviewCriteria, request);
@@ -63,7 +66,8 @@ public class ReviewCriteriaServiceImpl implements ReviewCriteriaService {
 
     @Override
     public void deleteReviewCriteria(Long id) {
-        ReviewCriteria reviewCriteria = reviewCriteriaRepository.findById(id)
+        ReviewCriteria reviewCriteria = reviewCriteriaRepository
+                .findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_CRITERIA_NOT_FOUND));
         reviewCriteriaRepository.delete(reviewCriteria);
     }

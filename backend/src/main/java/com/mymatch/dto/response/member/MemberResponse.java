@@ -1,10 +1,9 @@
 package com.mymatch.dto.response.member;
 
-import com.mymatch.dto.response.skill.SkillResponse;
+import java.util.Set;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @Builder
@@ -17,5 +16,4 @@ public class MemberResponse {
     String note;
     String image;
     Set<MemberSkillResponse> memberSkills;
-
 }

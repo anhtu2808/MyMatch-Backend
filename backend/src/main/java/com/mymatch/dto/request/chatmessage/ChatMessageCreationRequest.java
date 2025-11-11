@@ -2,6 +2,7 @@ package com.mymatch.dto.request.chatmessage;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 public class ChatMessageCreationRequest {
     @NotNull
     Long conversationId;
+
     @NotBlank
     String message;
 }

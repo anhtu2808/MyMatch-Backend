@@ -1,14 +1,15 @@
 package com.mymatch.dto.response.review;
 
+import java.util.List;
+
 import com.mymatch.dto.response.course.CourseResponse;
 import com.mymatch.dto.response.lecturer.LecturerResponse;
 import com.mymatch.dto.response.reviewdetail.ReviewDetailResponse;
 import com.mymatch.dto.response.semester.SemesterResponse;
 import com.mymatch.dto.response.student.StudentResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @Builder

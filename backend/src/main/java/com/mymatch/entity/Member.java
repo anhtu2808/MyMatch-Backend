@@ -1,13 +1,13 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
+import java.util.*;
+
 import jakarta.persistence.*;
+
+import com.mymatch.common.AbstractAuditingEntity;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
-import java.util.*;
 
 @Getter
 @Setter
@@ -22,6 +22,7 @@ public class Member extends AbstractAuditingEntity {
     Long id;
 
     String name;
+
     @Column(length = 1000)
     String note;
 

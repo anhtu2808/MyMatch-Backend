@@ -5,7 +5,6 @@ import com.mymatch.dto.response.transaction.TransactionResponse;
 import com.mymatch.dto.response.wallet.WalletResponse;
 import com.mymatch.entity.Transaction;
 
-
 public interface WalletService {
 
     /**

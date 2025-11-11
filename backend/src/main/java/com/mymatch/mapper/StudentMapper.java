@@ -1,13 +1,14 @@
 package com.mymatch.mapper;
 
-import com.mymatch.dto.request.student.StudentCreationRequest;
-import com.mymatch.dto.request.student.StudentUpdateRequest;
-import com.mymatch.dto.response.student.StudentResponse;
-import com.mymatch.entity.Student;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+
+import com.mymatch.dto.request.student.StudentCreationRequest;
+import com.mymatch.dto.request.student.StudentUpdateRequest;
+import com.mymatch.dto.response.student.StudentResponse;
+import com.mymatch.entity.Student;
 
 @Mapper(
         componentModel = "spring",
@@ -18,6 +19,7 @@ public interface StudentMapper {
     @Mapping(target = "campus", ignore = true)
     @Mapping(target = "user", ignore = true)
     Student toEntity(StudentCreationRequest req);
+
     @Mapping(target = "user.role", ignore = true)
     @Mapping(target = "user.student", ignore = true)
     StudentResponse toResponse(Student entity);

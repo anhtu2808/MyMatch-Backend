@@ -1,14 +1,17 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
+import com.mymatch.common.AbstractAuditingEntity;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -23,10 +26,13 @@ public class ReviewDetail extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     Long id;
+
     @ManyToOne
     Review review;
+
     @ManyToOne
     ReviewCriteria criteria;
+
     int score;
     String comment;
     Boolean isYes;

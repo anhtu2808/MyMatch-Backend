@@ -1,11 +1,12 @@
 package com.mymatch.dto.response.lecturer;
 
+import java.util.List;
+
 import com.mymatch.dto.response.campus.CampusResponse;
 import com.mymatch.dto.response.tag.TagResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @Builder

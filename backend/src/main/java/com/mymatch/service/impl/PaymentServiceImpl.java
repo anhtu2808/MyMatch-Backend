@@ -1,31 +1,28 @@
 package com.mymatch.service.impl;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.mymatch.dto.request.payment.SepayWebhookDTO;
 import com.mymatch.dto.response.payment.PaymentResponse;
-
-import com.mymatch.entity.Transaction;
 import com.mymatch.entity.Wallet;
-import com.mymatch.enums.TransactionSource;
-import com.mymatch.enums.TransactionStatus;
-import com.mymatch.enums.TransactionType;
 import com.mymatch.exception.AppException;
 import com.mymatch.exception.ErrorCode;
 import com.mymatch.repository.TransactionRepository;
 import com.mymatch.repository.WalletRepository;
+import com.mymatch.service.PaymentService;
 import com.mymatch.service.WalletService;
 import com.mymatch.utils.SecurityUtil;
 import com.mymatch.utils.WalletCodeUtil;
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import com.mymatch.service.PaymentService;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 
 @Slf4j
 @Service
@@ -56,16 +53,15 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentResponse createQrCodePayment() {
         var userId = SecurityUtil.getCurrentUserId();
-        Wallet wallet = walletRepository.findByUserId(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Wallet wallet =
+                walletRepository.findByUserId(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         String code = codeUtil.toFull(wallet.getCode());
 
         String qrUrl = qrCodeBaseUrl
                 + "/img?acc=" + URLEncoder.encode(accountNumber, StandardCharsets.UTF_8)
                 + "&bank=" + URLEncoder.encode(bankCode, StandardCharsets.UTF_8)
-                + "&des=" + URLEncoder.encode(code, StandardCharsets.UTF_8)
-                ;
+                + "&des=" + URLEncoder.encode(code, StandardCharsets.UTF_8);
 
         return PaymentResponse.builder()
                 .qrUrl(qrUrl)
@@ -89,6 +85,6 @@ public class PaymentServiceImpl implements PaymentService {
             log.warn("Ignore transfer without payment code: {}", sepayWebhookDTO.getId());
             return;
         }
-        walletService.topUpWallet(code,sepayWebhookDTO.getTransferAmount().doubleValue());
+        walletService.topUpWallet(code, sepayWebhookDTO.getTransferAmount().doubleValue());
     }
 }

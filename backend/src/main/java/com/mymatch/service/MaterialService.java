@@ -6,7 +6,6 @@ import com.mymatch.dto.request.material.MaterialUpdateRequest;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.filemanager.FileDownloadResponse;
 import com.mymatch.dto.response.material.MaterialResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface MaterialService {
     MaterialResponse createMaterial(MaterialCreationRequest request) throws Exception;
@@ -17,7 +16,8 @@ public interface MaterialService {
 
     MaterialResponse purchaseMaterial(Long materialId);
 
-    PageResponse<MaterialResponse> getAllMaterials(MaterialFilter filter, int page, int size, String sortBy, String sortDir);
+    PageResponse<MaterialResponse> getAllMaterials(
+            MaterialFilter filter, int page, int size, String sortBy, String sortDir);
 
     FileDownloadResponse downloadMaterial(Long materialId);
 

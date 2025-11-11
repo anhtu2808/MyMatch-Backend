@@ -9,9 +9,14 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class StudentFilterRequest {
-    @Builder.Default int page = 1;
-    @Builder.Default int size = 10;
-    @Builder.Default String sortBy = "id";
+    @Builder.Default
+    int page = 1;
+
+    @Builder.Default
+    int size = 10;
+
+    @Builder.Default
+    String sortBy = "id";
 
     Long campusId;
 }

@@ -1,5 +1,11 @@
 package com.mymatch.service.impl;
 
+import java.util.*;
+
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.mymatch.dto.request.member.MemberCreationRequest;
 import com.mymatch.dto.request.team.*;
 import com.mymatch.dto.request.teammember.TeamMemberAddRequest;
@@ -19,16 +25,11 @@ import com.mymatch.repository.*;
 import com.mymatch.service.*;
 import com.mymatch.specification.TeamSpecification;
 import com.mymatch.utils.SecurityUtil;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-
 
 @Slf4j
 @Service
@@ -54,14 +55,16 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     public TeamResponse createTeam(TeamCreationRequest req) {
         Long userId = SecurityUtil.getCurrentUserId();
-        User current = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User current = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (current.getStudent() == null) throw new AppException(ErrorCode.STUDENT_INFO_REQUIRED);
-        Semester semester = semesterRepository.findById(req.getSemesterId())
+        Semester semester = semesterRepository
+                .findById(req.getSemesterId())
                 .orElseThrow(() -> new AppException(ErrorCode.SEMESTER_NOT_FOUND));
-        Campus campus = campusRepository.findById(req.getCampusId())
+        Campus campus = campusRepository
+                .findById(req.getCampusId())
                 .orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND));
-        Course course = courseRepository.findById(req.getCourseId())
+        Course course = courseRepository
+                .findById(req.getCourseId())
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
         var team = teamMapper.toEntity(req, semester, campus, course);
@@ -90,12 +93,11 @@ public class TeamServiceImpl implements TeamService {
         if (req.getMembers() != null && !req.getMembers().isEmpty()) {
             for (MemberCreationRequest member : req.getMembers()) {
                 MemberResponse memberResponse = memberService.createMember(member);
-                teamMembers.add(
-                        teamMemberService.addMember(
-                                team.getId(),
-                                TeamMemberAddRequest.builder().memberId(memberResponse.getId()).build()
-                        )
-                );
+                teamMembers.add(teamMemberService.addMember(
+                        team.getId(),
+                        TeamMemberAddRequest.builder()
+                                .memberId(memberResponse.getId())
+                                .build()));
             }
         }
         var res = teamMapper.toResponse(team);
@@ -105,19 +107,22 @@ public class TeamServiceImpl implements TeamService {
         res.setMemberCount(teamMembers != null ? teamMembers.size() : 0);
         return res;
     }
+
     @Override
     @Transactional
     public TeamResponse updateTeam(Long id, TeamUpdateRequest req) {
 
-        Team team = teamRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
+        Team team = teamRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
         checkOwnerOrAdmin(team, "team:update");
         teamMapper.update(team, req);
-        team.setSemester(semesterRepository.findById(req.getSemesterId())
+        team.setSemester(semesterRepository
+                .findById(req.getSemesterId())
                 .orElseThrow(() -> new AppException(ErrorCode.SEMESTER_NOT_FOUND)));
-        team.setCampus(campusRepository.findById(req.getCampusId())
+        team.setCampus(campusRepository
+                .findById(req.getCampusId())
                 .orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_FOUND)));
-        team.setCourse(courseRepository.findById(req.getCourseId())
+        team.setCourse(courseRepository
+                .findById(req.getCourseId())
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND)));
         team = teamRepository.save(team);
         // 1) TeamRequest ops
@@ -138,7 +143,8 @@ public class TeamServiceImpl implements TeamService {
         }
 
         // Members: remove first
-        if (req.getTeamMemberIdsToRemove() != null && !req.getTeamMemberIdsToRemove().isEmpty()) {
+        if (req.getTeamMemberIdsToRemove() != null
+                && !req.getTeamMemberIdsToRemove().isEmpty()) {
             for (Long tmId : req.getTeamMemberIdsToRemove()) teamMemberService.deleteMember(id, tmId);
         }
         // Create new members then add
@@ -146,7 +152,8 @@ public class TeamServiceImpl implements TeamService {
             // capacity check...
             for (MemberCreationRequest m : req.getMembersToCreate()) {
                 MemberResponse mr = memberService.createMember(m);
-                teamMemberService.addMember(id, TeamMemberAddRequest.builder().memberId(mr.getId()).build());
+                teamMemberService.addMember(
+                        id, TeamMemberAddRequest.builder().memberId(mr.getId()).build());
             }
         }
         // sau khi xử lý add/remove TeamRequest & TeamMember
@@ -157,10 +164,14 @@ public class TeamServiceImpl implements TeamService {
         }
 
         var res = teamMapper.toResponse(team);
-        var reqs = team.getRequests()==null ? List.<TeamRequestResponse>of()
+        var reqs = team.getRequests() == null
+                ? List.<TeamRequestResponse>of()
                 : team.getRequests().stream().map(teamRequestMapper::toResponse).toList();
-        var tms  = team.getTeamMembers()==null ? List.<TeamMemberResponse>of()
-                : team.getTeamMembers().stream().map(teamMemberMapper::toResponse).toList();
+        var tms = team.getTeamMembers() == null
+                ? List.<TeamMemberResponse>of()
+                : team.getTeamMembers().stream()
+                        .map(teamMemberMapper::toResponse)
+                        .toList();
 
         res.setTeamRequest(reqs);
         res.setTeamMember(tms);
@@ -168,30 +179,32 @@ public class TeamServiceImpl implements TeamService {
         res.setMemberCount(tms.size());
         return res;
     }
+
     @Override
     public TeamResponse getTeamById(Long id) {
-        var team = teamRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
+        var team = teamRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
         var teamResponse = teamMapper.toResponse(team);
-        List<TeamRequestResponse> requestResponses = team.getRequests() == null ? Collections.emptyList() :
-                team.getRequests().stream()
-                        .map(teamRequestMapper::toResponse)
-                        .toList();
-        List<TeamMemberResponse> memberResponses = team.getTeamMembers() == null ? Collections.emptyList() :
-                team.getTeamMembers().stream()
+        List<TeamRequestResponse> requestResponses = team.getRequests() == null
+                ? Collections.emptyList()
+                : team.getRequests().stream().map(teamRequestMapper::toResponse).toList();
+        List<TeamMemberResponse> memberResponses = team.getTeamMembers() == null
+                ? Collections.emptyList()
+                : team.getTeamMembers().stream()
                         .map(teamMemberMapper::toResponse)
                         .toList();
         teamResponse.setTeamRequest(requestResponses);
         teamResponse.setTeamMember(memberResponses);
-        teamResponse.setRequestCount( (team.getRequests() == null ? 0 : team.getRequests().size()) );
-        teamResponse.setMemberCount( (team.getTeamMembers() == null ? 0 : team.getTeamMembers().size()) );
+        teamResponse.setRequestCount(
+                (team.getRequests() == null ? 0 : team.getRequests().size()));
+        teamResponse.setMemberCount(
+                (team.getTeamMembers() == null ? 0 : team.getTeamMembers().size()));
         return teamResponse;
     }
+
     @Override
     public void deleteTeam(Long id) {
-       Team team = teamRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
-       checkOwnerOrAdmin(team, "team:delete");
+        Team team = teamRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
+        checkOwnerOrAdmin(team, "team:delete");
         teamRepository.delete(team);
     }
 
@@ -200,29 +213,35 @@ public class TeamServiceImpl implements TeamService {
         var spec = TeamSpecification.byFilter(f);
         var sort = Sort.by(
                 Sort.Direction.fromOptionalString(f.getSortDirection()).orElse(Sort.Direction.DESC),
-                (f.getSortBy() == null || f.getSortBy().isBlank()) ? "createAt" : f.getSortBy()
-        );
+                (f.getSortBy() == null || f.getSortBy().isBlank()) ? "createAt" : f.getSortBy());
         Pageable pageable = PageRequest.of(Math.max(f.getPage() - 1, 0), Math.max(f.getSize(), 1), sort);
         Page<Team> pages = teamRepository.findAll(spec, pageable);
-        List<TeamResponse> data = pages.getContent().stream().map(t -> {
-            var r = teamMapper.toResponse(t);
+        List<TeamResponse> data = pages.getContent().stream()
+                .map(t -> {
+                    var r = teamMapper.toResponse(t);
 
-            // map teamRequest
-            var reqs = (t.getRequests() == null) ? List.<TeamRequestResponse>of()
-                    : t.getRequests().stream().map(teamRequestMapper::toResponse).toList();
-            r.setTeamRequest(reqs);
+                    // map teamRequest
+                    var reqs = (t.getRequests() == null)
+                            ? List.<TeamRequestResponse>of()
+                            : t.getRequests().stream()
+                                    .map(teamRequestMapper::toResponse)
+                                    .toList();
+                    r.setTeamRequest(reqs);
 
-            // map teamMember
-            var members = (t.getTeamMembers() == null) ? List.<TeamMemberResponse>of()
-                    : t.getTeamMembers().stream().map(teamMemberMapper::toResponse).toList();
-            r.setTeamMember(members);
+                    // map teamMember
+                    var members = (t.getTeamMembers() == null)
+                            ? List.<TeamMemberResponse>of()
+                            : t.getTeamMembers().stream()
+                                    .map(teamMemberMapper::toResponse)
+                                    .toList();
+                    r.setTeamMember(members);
 
-            // set counts
-            r.setRequestCount(reqs.size());
-            r.setMemberCount(members.size());
-            return r;
-
-        }).toList();
+                    // set counts
+                    r.setRequestCount(reqs.size());
+                    r.setMemberCount(members.size());
+                    return r;
+                })
+                .toList();
 
         return PageResponse.<TeamResponse>builder()
                 .data(data)
@@ -232,6 +251,7 @@ public class TeamServiceImpl implements TeamService {
                 .currentPage(f.getPage())
                 .build();
     }
+
     private void checkOwnerOrAdmin(Team team, String authority) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
         boolean isOwner = team.getCreatedBy() != null

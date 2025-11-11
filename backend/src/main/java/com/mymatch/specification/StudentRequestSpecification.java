@@ -1,8 +1,9 @@
 package com.mymatch.specification;
 
+import org.springframework.data.jpa.domain.Specification;
+
 import com.mymatch.dto.request.studentrequest.StudentRequestFilterRequest;
 import com.mymatch.entity.StudentRequest;
-import org.springframework.data.jpa.domain.Specification;
 
 public class StudentRequestSpecification {
 
@@ -26,7 +27,11 @@ public class StudentRequestSpecification {
                 p = cb.and(p, cb.equal(root.get("status"), f.getStatus()));
             }
             if (f.getClassCode() != null && !f.getClassCode().isBlank()) {
-                p = cb.and(p, cb.equal(cb.lower(root.get("classCode")), f.getClassCode().toLowerCase()));
+                p = cb.and(
+                        p,
+                        cb.equal(
+                                cb.lower(root.get("classCode")),
+                                f.getClassCode().toLowerCase()));
             }
             return p;
         };

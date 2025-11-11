@@ -1,7 +1,8 @@
 package com.mymatch.repository;
 
-import com.mymatch.entity.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
-}
+import com.mymatch.entity.Payment;
+
+public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpecificationExecutor<Payment> {}

@@ -1,5 +1,16 @@
 package com.mymatch.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.mymatch.dto.request.lecturercourse.LecturerCourseCreationRequest;
 import com.mymatch.dto.request.review.ReviewCreationRequest;
 import com.mymatch.dto.request.review.ReviewFilterRequest;
@@ -24,21 +35,11 @@ import com.mymatch.service.ReviewService;
 import com.mymatch.service.WalletService;
 import com.mymatch.specification.ReviewSpecification;
 import com.mymatch.utils.SecurityUtil;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -59,34 +60,38 @@ public class ReviewServiceImpl implements ReviewService {
     LecturerCourseService lecturerCourseService;
     WalletService walletService;
 
-
     @Override
     @Transactional
     public ReviewResponse createReview(ReviewCreationRequest request) {
-        Lecturer lecturer = lecturerRepository.findById(request.getLecturerId())
+        Lecturer lecturer = lecturerRepository
+                .findById(request.getLecturerId())
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURER_NOT_FOUND));
-        Student student = studentRepository.findByUserId(SecurityUtil.getCurrentUserId())
+        Student student = studentRepository
+                .findByUserId(SecurityUtil.getCurrentUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        Course course = courseRepository.findById(request.getCourseId())
+        Course course = courseRepository
+                .findById(request.getCourseId())
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         Review review = reviewMapper.toReview(request, lecturer, course, student);
         if (request.getSemesterId() != null) {
-            Semester semester = semesterRepository.findById(request.getSemesterId())
+            Semester semester = semesterRepository
+                    .findById(request.getSemesterId())
                     .orElseThrow(() -> new AppException(ErrorCode.SEMESTER_NOT_FOUND));
             review.setSemester(semester);
         }
-        boolean hasTakenCourse = lecturerCourseRepository
-                .existsByLecturer_IdAndCourse_Id(lecturer.getId(), course.getId());
-        if (!hasTakenCourse) {// nếu giảng viên chưa dạy học phần này thì tự động thêm giảng viên dạy học phần
-        lecturerCourseService.assign(LecturerCourseCreationRequest.builder()
-                .courseId(course.getId())
-                .lecturerId(lecturer.getId())
-                .build());
+        boolean hasTakenCourse =
+                lecturerCourseRepository.existsByLecturer_IdAndCourse_Id(lecturer.getId(), course.getId());
+        if (!hasTakenCourse) { // nếu giảng viên chưa dạy học phần này thì tự động thêm giảng viên dạy học phần
+            lecturerCourseService.assign(LecturerCourseCreationRequest.builder()
+                    .courseId(course.getId())
+                    .lecturerId(lecturer.getId())
+                    .build());
         }
         review = reviewRepository.save(review);
         List<ReviewDetail> details = new ArrayList<>();
         for (ReviewDetailRequest detail : request.getDetails()) {
-            ReviewCriteria criteria = reviewCriteriaRepository.findById(detail.getCriteriaId())
+            ReviewCriteria criteria = reviewCriteriaRepository
+                    .findById(detail.getCriteriaId())
                     .orElseThrow(() -> new AppException(ErrorCode.REVIEW_CRITERIA_NOT_FOUND));
             ReviewDetail reviewDetail = reviewDetailMapper.toReviewDetail(detail, criteria);
             reviewDetail.setReview(review);
@@ -110,8 +115,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void deleteReview(Long reviewId) {
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
+        Review review =
+                reviewRepository.findById(reviewId).orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
 
         Long currentUserId = SecurityUtil.getCurrentUserId();
         boolean isAdmin = SecurityUtil.hasAuthority("review:delete"); // check if admin
@@ -123,30 +128,18 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageResponse<ReviewResponse> getAllReviews(ReviewFilterRequest filterRequest,
-                                                      int page,
-                                                      int size,
-                                                      String sortBy,
-                                                      String sortDirection) {
-        Sort.Direction direction = Sort.Direction.fromOptionalString(sortDirection)
-                .orElse(Sort.Direction.DESC);
+    public PageResponse<ReviewResponse> getAllReviews(
+            ReviewFilterRequest filterRequest, int page, int size, String sortBy, String sortDirection) {
+        Sort.Direction direction =
+                Sort.Direction.fromOptionalString(sortDirection).orElse(Sort.Direction.DESC);
 
         Sort sort = Sort.by(direction, sortBy != null ? sortBy : "createdAt");
 
-        Pageable pageable = PageRequest.of(
-                Math.max(page - 1, 0),
-                Math.max(size, 1),
-                sort
-        );
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.max(size, 1), sort);
 
-
-        Page<Review> pages = reviewRepository.findAll(
-                ReviewSpecification.byFilter(filterRequest),
-                pageable
-        );
-        List<ReviewResponse> reviewResponses = pages.getContent().stream()
-                .map(reviewMapper::toReviewResponse)
-                .toList();
+        Page<Review> pages = reviewRepository.findAll(ReviewSpecification.byFilter(filterRequest), pageable);
+        List<ReviewResponse> reviewResponses =
+                pages.getContent().stream().map(reviewMapper::toReviewResponse).toList();
 
         return PageResponse.<ReviewResponse>builder()
                 .data(reviewResponses)
@@ -157,18 +150,16 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
     }
 
-
     @Override
     public ReviewResponse getById(Long id) {
-        Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
         return reviewMapper.toReviewResponse(review);
     }
 
     @Override
     public ReviewResponse updateReview(Long reviewId, ReviewUpdateRequest request) {
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
+        Review review =
+                reviewRepository.findById(reviewId).orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
 
         Long currentUserId = SecurityUtil.getCurrentUserId();
         boolean isAdmin = SecurityUtil.hasAuthority("review:update"); // check if admin
@@ -179,7 +170,6 @@ public class ReviewServiceImpl implements ReviewService {
         var isVerifyBonus = false;
         if (request.getIsVerified() && !review.getIsVerified()) {
             isVerifyBonus = true;
-
         }
         reviewMapper.updateReview(review, request);
         reviewRepository.save(review);
@@ -213,8 +203,7 @@ public class ReviewServiceImpl implements ReviewService {
         int numberOfCriteria = 0;
 
         for (ReviewDetail detail : details) {
-            if (detail.getCriteria() != null
-                    && detail.getCriteria().getType().equals(CriteriaType.mark)) {
+            if (detail.getCriteria() != null && detail.getCriteria().getType().equals(CriteriaType.mark)) {
                 totalScore += detail.getScore();
                 numberOfCriteria++;
             }

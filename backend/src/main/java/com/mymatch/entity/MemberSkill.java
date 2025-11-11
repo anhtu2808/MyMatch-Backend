@@ -1,9 +1,9 @@
 package com.mymatch.entity;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 
 @Getter
 @Setter
@@ -12,10 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(
-        name = "member_skill",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"member_id","skill_id"})
-)
+@Table(name = "member_skill", uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "skill_id"}))
 public class MemberSkill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

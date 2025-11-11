@@ -1,10 +1,10 @@
 package com.mymatch.repository;
 
-import com.mymatch.entity.MaterialItem;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
+import com.mymatch.entity.MaterialItem;
 
 public interface MaterialItemRepository extends JpaRepository<MaterialItem, Long> {
     List<MaterialItem> findAllByIdInAndMaterialIsNull(List<Long> ids);

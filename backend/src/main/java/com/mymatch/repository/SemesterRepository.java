@@ -1,12 +1,11 @@
 package com.mymatch.repository;
 
-import com.mymatch.entity.Campus;
-import com.mymatch.entity.Lecturer;
-import com.mymatch.entity.Semester;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
+import com.mymatch.entity.Semester;
 
 public interface SemesterRepository extends JpaRepository<Semester, Long>, JpaSpecificationExecutor<Semester> {
 

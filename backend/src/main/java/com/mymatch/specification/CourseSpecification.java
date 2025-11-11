@@ -1,8 +1,9 @@
 package com.mymatch.specification;
 
+import org.springframework.data.jpa.domain.Specification;
+
 import com.mymatch.dto.request.course.CourseFilterRequest;
 import com.mymatch.entity.Course;
-import org.springframework.data.jpa.domain.Specification;
 
 public class CourseSpecification {
 

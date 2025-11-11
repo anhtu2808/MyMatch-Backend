@@ -1,6 +1,9 @@
 package com.mymatch.entity;
-import com.mymatch.common.AbstractAuditingEntity;
+
 import jakarta.persistence.*;
+
+import com.mymatch.common.AbstractAuditingEntity;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,10 +14,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(
-        name = "team_member",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"team_id","member_id"})
-)
+@Table(name = "team_member", uniqueConstraints = @UniqueConstraint(columnNames = {"team_id", "member_id"}))
 public class TeamMember extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

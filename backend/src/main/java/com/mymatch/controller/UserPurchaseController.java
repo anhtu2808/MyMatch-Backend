@@ -1,17 +1,20 @@
 package com.mymatch.controller;
 
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.purchase.UserPurchaseCreateRequest;
 import com.mymatch.dto.request.purchase.UserPurchaseFilterRequest;
 import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.purchase.UserPurchaseResponse;
 import com.mymatch.service.UserPurchaseService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserPurchaseController {
     UserPurchaseService userPurchaseService;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<UserPurchaseResponse> create(@Valid @RequestBody UserPurchaseCreateRequest request) {
@@ -35,8 +39,7 @@ public class UserPurchaseController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false, defaultValue = "DESC") String sortDirection
-    ) {
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         return ApiResponse.<PageResponse<UserPurchaseResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Lấy danh sách purchase thành công")

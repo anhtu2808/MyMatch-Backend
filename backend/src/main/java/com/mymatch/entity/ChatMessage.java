@@ -1,11 +1,14 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
+import com.mymatch.common.AbstractAuditingEntity;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -20,14 +23,15 @@ public class ChatMessage extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @ManyToOne
-    @JoinColumn(name="conversation_id", nullable=false)
+    @JoinColumn(name = "conversation_id", nullable = false)
     Conversation conversation;
 
     @ManyToOne
-    @JoinColumn(name="sender_id", nullable=false)
+    @JoinColumn(name = "sender_id", nullable = false)
     Student sender;
 
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     String message;
 }

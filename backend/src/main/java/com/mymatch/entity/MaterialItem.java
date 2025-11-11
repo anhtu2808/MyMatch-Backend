@@ -1,11 +1,14 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
+import com.mymatch.common.AbstractAuditingEntity;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -20,15 +23,20 @@ public class MaterialItem extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id")
     private Material material;
+
     private String fileURL;
     Double size;
+
     @Column(nullable = false)
     String originalFileName;
+
     @Column(nullable = false)
     String fileType;
+
     @Builder.Default
     int downloadCont = 0;
 }

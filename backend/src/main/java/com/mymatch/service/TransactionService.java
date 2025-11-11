@@ -12,7 +12,13 @@ public interface TransactionService {
      * Khởi tạo một giao dịch ở trạng thái PENDING.
      * Method này sẽ chạy trong một transaction độc lập.
      */
-    Transaction initiateTransaction(Wallet wallet, Long coin, Double amountVND, TransactionType type, TransactionSource source, String description);
+    Transaction initiateTransaction(
+            Wallet wallet,
+            Long coin,
+            Double amountVND,
+            TransactionType type,
+            TransactionSource source,
+            String description);
 
     /**
      * Đánh dấu giao dịch là đã HOÀN THÀNH.

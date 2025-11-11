@@ -1,12 +1,14 @@
 package com.mymatch.dto.request.review;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotEmpty;
-import com.mymatch.dto.request.reviewdetail.ReviewDetailRequest;
 import jakarta.validation.constraints.NotNull;
+
+import com.mymatch.dto.request.reviewdetail.ReviewDetailRequest;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 /**
  * Request body to create a Review.
@@ -35,11 +37,8 @@ public class ReviewCreationRequest {
 
     Boolean isAnonymous;
 
-
     String evidenceUrl;
 
     @NotEmpty
     List<ReviewDetailRequest> details;
-
-
 }

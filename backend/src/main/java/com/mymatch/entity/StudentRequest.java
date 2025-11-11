@@ -1,15 +1,18 @@
 package com.mymatch.entity;
 
-import com.mymatch.common.AbstractAuditingEntity;
-import com.mymatch.enums.RequestStatus;
+import java.time.LocalDateTime;
+import java.util.*;
+
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import com.mymatch.common.AbstractAuditingEntity;
+import com.mymatch.enums.RequestStatus;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -23,8 +26,9 @@ public class StudentRequest extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    String requestDetail;   // tiêu đề/ngắn gọn
-    Double goal;            // mục tiêu điểm (nếu có)
+
+    String requestDetail; // tiêu đề/ngắn gọn
+    Double goal; // mục tiêu điểm (nếu có)
 
     @Column(name = "class", length = 8)
     String classCode;

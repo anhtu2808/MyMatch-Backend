@@ -1,18 +1,21 @@
 package com.mymatch.controller;
 
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mymatch.dto.request.chatmessage.ChatMessageCreationRequest;
 import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.chatmessage.ChatMessageResponse;
 import com.mymatch.service.ChatMessageService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/messages")
@@ -20,23 +23,20 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChatMessageController {
     ChatMessageService chatMessageService;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    ApiResponse<ChatMessageResponse> createChatMessage(
-            @RequestBody
-            @Valid
-            ChatMessageCreationRequest request
-    ) throws JsonProcessingException {
-     return ApiResponse.<ChatMessageResponse>builder()
+    ApiResponse<ChatMessageResponse> createChatMessage(@RequestBody @Valid ChatMessageCreationRequest request)
+            throws JsonProcessingException {
+        return ApiResponse.<ChatMessageResponse>builder()
                 .code(HttpStatus.CREATED.value())
                 .message("Tạo tin nhắn thành công")
                 .result(chatMessageService.createChatMessage(request))
                 .build();
     }
+
     @GetMapping
-    ApiResponse<List<ChatMessageResponse>> getMessages(
-            @RequestParam("conversationId") Long conversationId
-    ) {
+    ApiResponse<List<ChatMessageResponse>> getMessages(@RequestParam("conversationId") Long conversationId) {
         return ApiResponse.<List<ChatMessageResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Lấy tin nhắn thành công")

@@ -1,5 +1,10 @@
 package com.mymatch.controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.university.UniversityCreationRequest;
 import com.mymatch.dto.request.university.UniversityUpdateRequest;
 import com.mymatch.dto.response.ApiResponse;
@@ -8,13 +13,9 @@ import com.mymatch.dto.response.semester.SemesterResponse;
 import com.mymatch.dto.response.university.UniversityResponse;
 import com.mymatch.service.SemesterService;
 import com.mymatch.service.UniversityService;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/universities")
@@ -53,7 +54,8 @@ public class UniversityController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<UniversityResponse> updateUniversity(@PathVariable Long id, @RequestBody UniversityUpdateRequest req) {
+    public ApiResponse<UniversityResponse> updateUniversity(
+            @PathVariable Long id, @RequestBody UniversityUpdateRequest req) {
         return ApiResponse.<UniversityResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Cập nhật trường đại học thành công")

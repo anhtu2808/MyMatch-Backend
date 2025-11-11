@@ -1,12 +1,14 @@
 package com.mymatch.entity;
 
+import java.util.UUID;
+
+import jakarta.persistence.*;
+
 import com.mymatch.common.AbstractAuditingEntity;
 import com.mymatch.enums.PaymentStatus;
-import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -36,6 +38,7 @@ public class Payment extends AbstractAuditingEntity {
     String virtualAccount;
 
     String qrUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     PaymentStatus status = PaymentStatus.PENDING;
@@ -43,5 +46,4 @@ public class Payment extends AbstractAuditingEntity {
     @OneToOne
     @JoinColumn(name = "transaction_id")
     Transaction transaction;
-
 }

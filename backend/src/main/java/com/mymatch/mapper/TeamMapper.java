@@ -1,12 +1,14 @@
 package com.mymatch.mapper;
 
+import org.mapstruct.*;
+
 import com.mymatch.dto.request.team.TeamCreationRequest;
 import com.mymatch.dto.request.team.TeamUpdateRequest;
 import com.mymatch.dto.response.team.TeamResponse;
 import com.mymatch.entity.*;
-import org.mapstruct.*;
 
-@Mapper(componentModel = "spring",
+@Mapper(
+        componentModel = "spring",
         uses = {SemesterMapper.class, CampusMapper.class, CourseMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface TeamMapper {

@@ -12,7 +12,7 @@ public class PaymentResponse {
     String accountNumber;
     String accountName;
     String bankCode;
-//    String amount;
+    //    String amount;
     String content;
     String qrUrl;
 }

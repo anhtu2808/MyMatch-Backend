@@ -1,8 +1,8 @@
 package com.mymatch.dto.request.lecturer;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -21,6 +21,4 @@ public class LecturerCreationRequest {
 
     @NotNull
     Long campusId;
-
-
 }

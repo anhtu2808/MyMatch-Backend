@@ -1,41 +1,38 @@
 package com.mymatch.service.impl;
 
-import com.mymatch.dto.request.student.StudentCreationRequest;
+import static com.mymatch.utils.SecurityUtil.hasAuthority;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.mymatch.dto.request.user.UserCreationRequest;
 import com.mymatch.dto.request.user.UserUpdateRequest;
 import com.mymatch.dto.response.PageResponse;
-import com.mymatch.dto.response.student.StudentResponse;
 import com.mymatch.dto.response.user.UserResponse;
 import com.mymatch.entity.*;
 import com.mymatch.enums.RoleType;
 import com.mymatch.exception.AppException;
 import com.mymatch.exception.ErrorCode;
 import com.mymatch.mapper.StudentMapper;
-import com.mymatch.mapper.StudentMapperImpl;
 import com.mymatch.mapper.UserMapper;
 import com.mymatch.repository.*;
 import com.mymatch.service.StudentService;
+import com.mymatch.service.UserService;
 import com.mymatch.utils.SecurityUtil;
 import com.mymatch.utils.WalletCodeUtil;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Service;
-import com.mymatch.service.UserService;
-import org.springframework.transaction.annotation.Transactional;
-
-
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.mymatch.utils.SecurityUtil.hasAuthority;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +50,7 @@ public class UserServiceImpl implements UserService {
     StudentMapper studentMapper;
     WalletCodeUtil codeUtil;
     WalletRepository walletRepository;
+
     @Override
     @Transactional
     public UserResponse createUser(UserCreationRequest request, RoleType roleType) {
@@ -61,9 +59,7 @@ public class UserServiceImpl implements UserService {
         Role role = roleRepository.findByName(roleType).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
-        Wallet wallet = Wallet.builder()
-                .coin(0L)
-                .build();
+        Wallet wallet = Wallet.builder().coin(0L).build();
         String walletCode;
         do walletCode = codeUtil.randomBase();
         while (walletRepository.existsByCode(walletCode));
@@ -74,8 +70,7 @@ public class UserServiceImpl implements UserService {
         user.setWallet(wallet);
 
         if (roleType == RoleType.STUDENT) {
-            Student student = studentRepository.save(studentMapper.toEntity(request.getStudentCreationRequest())
-            );
+            Student student = studentRepository.save(studentMapper.toEntity(request.getStudentCreationRequest()));
             user.setStudent(student);
         }
 
@@ -86,23 +81,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(UserUpdateRequest request, Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        User existingUser = userRepository.findById(SecurityUtil.getCurrentUserId())
+        User existingUser = userRepository
+                .findById(SecurityUtil.getCurrentUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if(!hasAuthority("user:update")){
-            if(!existingUser.getId().equals(user.getId())){
+        if (!hasAuthority("user:update")) {
+            if (!existingUser.getId().equals(user.getId())) {
                 throw new AppException(ErrorCode.FORBIDDEN);
             }
         }
         userMapper.toUser(user, request);
         if (request.getCampusId() != null) {
-            Campus campus = campusRepository.findById(request.getCampusId())
+            Campus campus = campusRepository
+                    .findById(request.getCampusId())
                     .orElseThrow(() -> new AppException(ErrorCode.CAMPUS_NOT_EXISTED));
             user.getStudent().setCampus(campus);
-    }
+        }
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-        @Override
+    @Override
     public UserResponse deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userRepository.delete(user);
@@ -110,8 +107,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void unBanUser(Long userId) {
-    }
+    public void unBanUser(Long userId) {}
 
     @Override
     public UserResponse getUser(Long id) {
@@ -141,6 +137,7 @@ public class UserServiceImpl implements UserService {
         userResponse.setPermissions(permissions);
         return userResponse;
     }
+
     @Override
     public PageResponse<UserResponse> getAllUsers(int page, int size, String sort, String filter, String searchTerm) {
         return null;

@@ -1,12 +1,13 @@
 package com.mymatch.repository;
 
-import com.mymatch.entity.Banner;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.mymatch.entity.Banner;
 
 @Repository
 public interface BannerRepository extends JpaRepository<Banner, Long> {

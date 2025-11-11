@@ -1,21 +1,24 @@
 package com.mymatch.service.impl;
 
-import com.mymatch.enums.StorageType;
-import com.mymatch.service.FileManagerService;
-import jakarta.annotation.PostConstruct;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.mymatch.enums.StorageType;
+import com.mymatch.service.FileManagerService;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -28,10 +31,8 @@ public class FileManagerServiceImpl implements FileManagerService {
     @Value("${file.storage.public}")
     String publicPath;
 
-
     Path privateRoot;
     Path publicRoot;
-
 
     @PostConstruct
     void init() {
@@ -73,11 +74,12 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     @Override
-    public String saveStream(InputStream inputStream,
-                             String originalFilename,
-                             String contentType,
-                             String subDirectory,
-                             StorageType type) {
+    public String saveStream(
+            InputStream inputStream,
+            String originalFilename,
+            String contentType,
+            String subDirectory,
+            StorageType type) {
         try {
             if (originalFilename == null || originalFilename.isBlank()) {
                 throw new RuntimeException("File name is invalid");
@@ -110,11 +112,11 @@ public class FileManagerServiceImpl implements FileManagerService {
         }
     }
 
-
     @Override
     public void delete(String filename, String subDirectory, StorageType type) {
         try {
-            Path filePath = resolveRoot(type).resolve(subDirectory).resolve(filename).normalize();
+            Path filePath =
+                    resolveRoot(type).resolve(subDirectory).resolve(filename).normalize();
             Files.deleteIfExists(filePath);
             log.info("File deleted: {}", filePath);
         } catch (IOException e) {
@@ -127,7 +129,6 @@ public class FileManagerServiceImpl implements FileManagerService {
 
         return userId.toString() + "/" + prefix;
     }
-
 
     private Path resolveRoot(StorageType type) {
         return type == StorageType.PUBLIC ? publicRoot : privateRoot;

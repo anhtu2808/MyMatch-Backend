@@ -1,22 +1,24 @@
 package com.mymatch.service.impl;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.mymatch.dto.request.teamrequest.TeamRequestCreationRequest;
 import com.mymatch.dto.request.teamrequest.TeamRequestUpdateRequest;
 import com.mymatch.dto.response.teamrequest.TeamRequestResponse;
+import com.mymatch.entity.*;
 import com.mymatch.exception.AppException;
 import com.mymatch.exception.ErrorCode;
 import com.mymatch.mapper.TeamRequestMapper;
+import com.mymatch.repository.*;
 import com.mymatch.repository.TeamRequestRepository;
 import com.mymatch.service.TeamRequestService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
-import com.mymatch.repository.*;
-import com.mymatch.entity.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,12 +43,8 @@ public class TeamRequestServiceImpl implements TeamRequestService {
                 throw new AppException(ErrorCode.INVALID_PARAMETER);
             }
             for (Skill s : skills) {
-                tr.getSkills().add(
-                        TeamRequestSkill.builder()
-                                .teamRequest(tr)
-                                .skill(s)
-                                .build()
-                );
+                tr.getSkills()
+                        .add(TeamRequestSkill.builder().teamRequest(tr).skill(s).build());
             }
         }
 
@@ -62,7 +60,8 @@ public class TeamRequestServiceImpl implements TeamRequestService {
 
     @Override
     public TeamRequestResponse updateTeamRequest(Long requestId, TeamRequestUpdateRequest req) {
-        TeamRequest tr = teamRequestRepository.findById(requestId)
+        TeamRequest tr = teamRequestRepository
+                .findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_FOUND));
         if (req.getId() != null && !req.getId().equals(requestId)) {
             throw new AppException(ErrorCode.INVALID_PARAMETER);
@@ -75,9 +74,8 @@ public class TeamRequestServiceImpl implements TeamRequestService {
             // remove cái không còn trong newIds
             tr.getSkills().removeIf(x -> !newIds.contains(x.getSkill().getId()));
             // còn lại: thêm những id mới
-            Set<Long> currentIds = tr.getSkills().stream()
-                    .map(x -> x.getSkill().getId())
-                    .collect(Collectors.toSet());
+            Set<Long> currentIds =
+                    tr.getSkills().stream().map(x -> x.getSkill().getId()).collect(Collectors.toSet());
             newIds.removeAll(currentIds);
             if (!newIds.isEmpty()) {
                 var skillsToAdd = skillRepository.findAllById(newIds);
@@ -85,12 +83,11 @@ public class TeamRequestServiceImpl implements TeamRequestService {
                     throw new AppException(ErrorCode.INVALID_PARAMETER);
                 }
                 for (Skill s : skillsToAdd) {
-                    tr.getSkills().add(
-                            TeamRequestSkill.builder()
+                    tr.getSkills()
+                            .add(TeamRequestSkill.builder()
                                     .teamRequest(tr)
                                     .skill(s)
-                                    .build()
-                    );
+                                    .build());
                 }
             }
         }
@@ -100,8 +97,9 @@ public class TeamRequestServiceImpl implements TeamRequestService {
 
     @Override
     public void deleteTeamRequest(Long requestId) {
-        TeamRequest tr = teamRequestRepository.findById(requestId)
-            .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_FOUND));
+        TeamRequest tr = teamRequestRepository
+                .findById(requestId)
+                .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_FOUND));
 
         Team team = tr.getTeam();
         if (team != null && team.getRequests() != null) {

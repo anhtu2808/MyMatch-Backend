@@ -1,12 +1,11 @@
 package com.mymatch.entity;
 
+import java.time.Instant;
+
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
-import java.time.Instant;
 
 @Getter
 @Setter

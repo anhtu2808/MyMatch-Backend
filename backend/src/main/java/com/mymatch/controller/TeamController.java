@@ -1,5 +1,10 @@
 package com.mymatch.controller;
 
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.team.TeamCreationRequest;
 import com.mymatch.dto.request.team.TeamFilterRequest;
 import com.mymatch.dto.request.team.TeamUpdateRequest;
@@ -7,12 +12,10 @@ import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.team.TeamResponse;
 import com.mymatch.service.TeamService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/teams")
@@ -32,8 +35,7 @@ public class TeamController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<TeamResponse> update(@PathVariable Long id,
-                                            @Valid @RequestBody TeamUpdateRequest req) {
+    public ApiResponse<TeamResponse> update(@PathVariable Long id, @Valid @RequestBody TeamUpdateRequest req) {
         return ApiResponse.<TeamResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Cập nhật team thành công")

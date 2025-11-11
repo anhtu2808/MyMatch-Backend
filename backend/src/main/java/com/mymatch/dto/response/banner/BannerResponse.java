@@ -1,10 +1,11 @@
 package com.mymatch.dto.response.banner;
 
+import java.time.LocalDateTime;
+
 import com.mymatch.enums.BannerStatus;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder

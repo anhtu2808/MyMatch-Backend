@@ -1,7 +1,9 @@
 package com.mymatch.dto.request.swap;
 
-import com.mymatch.enums.SwapDecision;
 import jakarta.validation.constraints.NotNull;
+
+import com.mymatch.enums.SwapDecision;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,5 +15,6 @@ import lombok.experimental.FieldDefaults;
 public class SwapUpdateRequest {
     @NotNull
     SwapDecision decision;
+
     String reason;
 }

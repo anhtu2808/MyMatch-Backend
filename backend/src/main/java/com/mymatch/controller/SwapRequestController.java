@@ -1,5 +1,10 @@
 package com.mymatch.controller;
 
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.swaprequest.SwapRequestCreationRequest;
 import com.mymatch.dto.request.swaprequest.SwapRequestFilterRequest;
 import com.mymatch.dto.request.swaprequest.SwapRequestUpdateRequest;
@@ -7,12 +12,10 @@ import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.swaprequest.SwapRequestResponse;
 import com.mymatch.service.SwapRequestService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/swap-requests")
@@ -42,9 +45,7 @@ public class SwapRequestController {
 
     @PutMapping("/{id}")
     public ApiResponse<SwapRequestResponse> updateSwapRequest(
-            @PathVariable Long id,
-            @RequestBody @Valid SwapRequestUpdateRequest req
-    ) {
+            @PathVariable Long id, @RequestBody @Valid SwapRequestUpdateRequest req) {
         return ApiResponse.<SwapRequestResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Cập nhật yêu cầu đổi lớp thành công")
@@ -61,6 +62,7 @@ public class SwapRequestController {
                 .message("Xoá yêu cầu đổi lớp thành công")
                 .build();
     }
+
     @GetMapping
     public ApiResponse<PageResponse<SwapRequestResponse>> getAllSwapRequests(
             @ModelAttribute SwapRequestFilterRequest req) {
@@ -70,6 +72,7 @@ public class SwapRequestController {
                 .result(swapRequestService.getAllSwapRequests(req))
                 .build();
     }
+
     @PatchMapping("/{id}/cancel")
     public ApiResponse<SwapRequestResponse> cancel(@PathVariable Long id) {
         return ApiResponse.<SwapRequestResponse>builder()

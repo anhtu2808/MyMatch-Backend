@@ -1,16 +1,18 @@
 package com.mymatch.service;
 
-import com.mymatch.enums.EmailType;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Locale;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.util.Locale;
-import java.util.Map;
+import com.mymatch.enums.EmailType;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -18,6 +20,7 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmailRenderer {
     SpringTemplateEngine templateEngine;
+
     public RenderedEmail render(EmailType type, Map<String, Object> model) {
         String template = type.name();
         Context ctx = new Context(Locale.ENGLISH, model);

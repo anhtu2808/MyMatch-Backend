@@ -1,12 +1,11 @@
 package com.mymatch.dto.response.teammember;
 
+import java.time.LocalDateTime;
+
 import com.mymatch.dto.response.member.MemberResponse;
-import com.mymatch.dto.response.skill.SkillResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -17,5 +16,4 @@ public class TeamMemberResponse {
     Long id;
     MemberResponse member;
     LocalDateTime createAt;
-
 }

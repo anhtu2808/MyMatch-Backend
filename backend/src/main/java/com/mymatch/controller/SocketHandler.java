@@ -1,5 +1,13 @@
 package com.mymatch.controller;
 
+import java.text.ParseException;
+import java.time.Instant;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+import org.springframework.stereotype.Component;
+
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
@@ -10,15 +18,10 @@ import com.mymatch.entity.WebSocketSession;
 import com.mymatch.repository.UserRepository;
 import com.mymatch.service.AuthenticationService;
 import com.mymatch.service.WebSocketSessionService;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import java.text.ParseException;
-import java.time.Instant;
 
 @Slf4j
 @Component
@@ -37,12 +40,11 @@ public class SocketHandler {
         // Get Token from request param
         String token = client.getHandshakeData().getSingleUrlParam("token");
 
-        //Verify token
-        IntrospectResponse introspectResponse = authenticationService.introspect(IntrospectRequest.builder()
-                .token(token)
-                .build());
+        // Verify token
+        IntrospectResponse introspectResponse = authenticationService.introspect(
+                IntrospectRequest.builder().token(token).build());
 
-        if (introspectResponse.isValid()){
+        if (introspectResponse.isValid()) {
             log.info("Client connected: {}", client.getSessionId());
             // Persist webSocketSession
             WebSocketSession webSocketSession = WebSocketSession.builder()
@@ -58,22 +60,24 @@ public class SocketHandler {
             client.disconnect();
         }
     }
+
     @OnDisconnect
     public void clientDisconnected(SocketIOClient client) {
         log.info("A client disconnected.{}", client.getSessionId());
         webSocketSessionService.deleteBySessionId(client.getSessionId().toString());
     }
-    @PostConstruct       // Khởi động server sau khi bean được khởi tạo
+
+    @PostConstruct // Khởi động server sau khi bean được khởi tạo
     public void startServer() {
         server.start();
         server.addListeners(this);
-        log.info("Socket.IO server started on port {}", server.getConfiguration().getPort());
+        log.info(
+                "Socket.IO server started on port {}", server.getConfiguration().getPort());
     }
+
     @PreDestroy
     public void stopServer() {
         server.stop();
         log.info("Socket.IO server stopped.");
     }
-
 }
-

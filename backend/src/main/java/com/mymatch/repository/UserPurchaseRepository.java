@@ -1,19 +1,18 @@
 package com.mymatch.repository;
-import com.mymatch.entity.UserPurchase;
-import com.mymatch.enums.PurchaseStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import java.util.List;
-import java.util.Optional;
+
+import com.mymatch.entity.UserPurchase;
+import com.mymatch.enums.PurchaseStatus;
 
 @Repository
 public interface UserPurchaseRepository
         extends JpaRepository<UserPurchase, Long>, JpaSpecificationExecutor<UserPurchase> {
-
 
     List<UserPurchase> findByUserId(Long userId);
 

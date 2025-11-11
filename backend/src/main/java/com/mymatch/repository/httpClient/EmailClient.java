@@ -1,12 +1,13 @@
 package com.mymatch.repository.httpClient;
 
-import com.mymatch.dto.request.email.EmailRequest;
-import com.mymatch.dto.response.email.EmailResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+
+import com.mymatch.dto.request.email.EmailRequest;
+import com.mymatch.dto.response.email.EmailResponse;
 
 @FeignClient(name = "email-client", url = "${notification.email.brevo-url}")
 public interface EmailClient {

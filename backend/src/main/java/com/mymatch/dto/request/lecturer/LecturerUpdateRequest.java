@@ -1,11 +1,12 @@
 package com.mymatch.dto.request.lecturer;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @Builder
@@ -24,5 +25,4 @@ public class LecturerUpdateRequest {
     Long campusId;
 
     List<Long> tagIds;
-
 }

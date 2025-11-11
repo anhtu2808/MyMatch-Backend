@@ -1,19 +1,22 @@
 package com.mymatch.controller;
 
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.plan.PlanCreationRequest;
 import com.mymatch.dto.request.plan.PlanUpdateRequest;
 import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.plan.PlanResponse;
 import com.mymatch.service.PlanService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/plans")
@@ -35,8 +38,7 @@ public class PlanController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<PlanResponse> updatePlan(@PathVariable Long id,
-                                            @Valid @RequestBody PlanUpdateRequest request) {
+    public ApiResponse<PlanResponse> updatePlan(@PathVariable Long id, @Valid @RequestBody PlanUpdateRequest request) {
         return ApiResponse.<PlanResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Cập nhật gói thành công")
@@ -52,7 +54,6 @@ public class PlanController {
                 .result(planService.getAll())
                 .build();
     }
-
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deletePlan(@PathVariable Long id) {

@@ -1,10 +1,11 @@
 package com.mymatch.utils;
 
-import com.mymatch.exception.AppException;
-import com.mymatch.exception.ErrorCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+
+import com.mymatch.exception.AppException;
+import com.mymatch.exception.ErrorCode;
 
 public class SecurityUtil {
     /**
@@ -36,9 +37,8 @@ public class SecurityUtil {
      */
     public static boolean hasAuthority(String authority) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null &&
-                authentication.getAuthorities().stream()
+        return authentication != null
+                && authentication.getAuthorities().stream()
                         .anyMatch(a -> a.getAuthority().equals(authority));
     }
-
 }

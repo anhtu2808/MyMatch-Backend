@@ -1,20 +1,22 @@
 package com.mymatch.entity;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.util.EnumSet;
+import java.util.Set;
+
+import jakarta.persistence.*;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.mymatch.common.AbstractAuditingEntity;
 import com.mymatch.enums.ClassesSlot;
 import com.mymatch.enums.SwapRequestStatus;
 import com.mymatch.enums.Visibility;
-import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -30,10 +32,13 @@ public class SwapRequest extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "student_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
     Student student;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "course_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
     Course course;
 
     @Column(name = "from_class", length = 10, nullable = false)
@@ -72,17 +77,14 @@ public class SwapRequest extends AbstractAuditingEntity {
     SwapRequestStatus status = SwapRequestStatus.SENT;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "swap_request_from_days",
-            joinColumns = @JoinColumn(name = "swap_request_id"))
+    @CollectionTable(name = "swap_request_from_days", joinColumns = @JoinColumn(name = "swap_request_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "day", length = 10, nullable = false)
     Set<DayOfWeek> fromDays = EnumSet.noneOf(DayOfWeek.class);
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "swap_request_to_days",
-            joinColumns = @JoinColumn(name = "swap_request_id"))
+    @CollectionTable(name = "swap_request_to_days", joinColumns = @JoinColumn(name = "swap_request_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "day", length = 10, nullable = false)
     Set<DayOfWeek> toDays = EnumSet.noneOf(DayOfWeek.class);
-
 }

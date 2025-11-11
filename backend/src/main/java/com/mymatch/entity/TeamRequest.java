@@ -1,14 +1,16 @@
 package com.mymatch.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import jakarta.persistence.*;
+
 import com.mymatch.common.AbstractAuditingEntity;
 import com.mymatch.enums.RequestStatus;
 import com.mymatch.enums.Urgency;
-import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -21,9 +23,11 @@ public class TeamRequest extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @ManyToOne
     @JoinColumn(name = "team_id", nullable = false)
     Team team;
+
     @Column(nullable = false)
     String title;
 
@@ -37,5 +41,4 @@ public class TeamRequest extends AbstractAuditingEntity {
 
     @OneToMany(mappedBy = "teamRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<TeamRequestSkill> skills = new HashSet<>();
-
 }

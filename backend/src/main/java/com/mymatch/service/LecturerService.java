@@ -1,11 +1,12 @@
 package com.mymatch.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.mymatch.dto.request.lecturer.LecturerCreationRequest;
 import com.mymatch.dto.request.lecturer.LecturerFilterRequest;
 import com.mymatch.dto.request.lecturer.LecturerUpdateRequest;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.lecturer.LecturerResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface LecturerService {
     @PreAuthorize("hasAuthority('lecturer:create')")

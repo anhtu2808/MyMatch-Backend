@@ -1,6 +1,7 @@
 package com.mymatch.dto.request.purchase;
 
 import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserPurchaseCreateRequest{
+public class UserPurchaseCreateRequest {
     @NotNull(message = "planId không được null")
     Long planId;
 }

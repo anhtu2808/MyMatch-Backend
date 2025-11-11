@@ -1,15 +1,17 @@
 package com.mymatch.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.campus.CampusCreationRequest;
 import com.mymatch.dto.request.campus.CampusUpdateRequest;
 import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.campus.CampusResponse;
 import com.mymatch.service.CampusService;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/campuses")

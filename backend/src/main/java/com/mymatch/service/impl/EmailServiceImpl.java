@@ -1,5 +1,10 @@
 package com.mymatch.service.impl;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.mymatch.dto.request.email.EmailRequest;
 import com.mymatch.dto.request.email.Recipient;
 import com.mymatch.dto.request.email.SendEmailRequest;
@@ -9,15 +14,12 @@ import com.mymatch.exception.AppException;
 import com.mymatch.exception.ErrorCode;
 import com.mymatch.repository.httpClient.EmailClient;
 import com.mymatch.service.EmailService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -29,6 +31,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("${notification.email.brevo-apikey}")
     @NonFinal
     String apiKey;
+
     @Override
     public EmailResponse sendEmail(SendEmailRequest request) {
         EmailRequest emailRequest = EmailRequest.builder()

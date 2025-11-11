@@ -1,5 +1,7 @@
 package com.mymatch.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 
 import org.hibernate.annotations.SQLDelete;
@@ -9,8 +11,6 @@ import com.mymatch.common.AbstractAuditingEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -41,5 +41,4 @@ public class Campus extends AbstractAuditingEntity {
 
     @OneToMany(mappedBy = "campus", fetch = FetchType.LAZY)
     List<Lecturer> lecturers;
-
 }

@@ -3,7 +3,6 @@ package com.mymatch.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,40 +23,40 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_POST = {
-            "/users/register",
-            "/auth/login",
-            "/auth/introspect",
-            "/auth/logout",
-            "/auth/refresh",
-            "/health-check",
-            "/student-verifications/**",
-            "/oauth2/**",
-            "/login/**",
-            "/auth/outbound/**",
-            "/swap-requests/**",
-            "/swaps/**",
-            "payments/internal/**",
-            "/images/**",
+        "/users/register",
+        "/auth/login",
+        "/auth/introspect",
+        "/auth/logout",
+        "/auth/refresh",
+        "/health-check",
+        "/student-verifications/**",
+        "/oauth2/**",
+        "/login/**",
+        "/auth/outbound/**",
+        "/swap-requests/**",
+        "/swaps/**",
+        "payments/internal/**",
+        "/images/**",
     };
 
     private static final String[] PUBLIC_GET = {
-            "/swagger-ui.html",
-            "/1111/**",
-            "/docs/1111/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/permissions/**",
-            "/roles/**",
-            "/swagger-resources/**",
-            "/webjars/**",
-            "/universities/**",
-            "/campuses/**",
-            "/lecturers/**",
-            "/courses/**",
-            "/review-criteria/**",
-            "/payments/qr-code",
-            "/plans/**",
-            "/banners/**",
+        "/swagger-ui.html",
+        "/1111/**",
+        "/docs/1111/**",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/permissions/**",
+        "/roles/**",
+        "/swagger-resources/**",
+        "/webjars/**",
+        "/universities/**",
+        "/campuses/**",
+        "/lecturers/**",
+        "/courses/**",
+        "/review-criteria/**",
+        "/payments/qr-code",
+        "/plans/**",
+        "/banners/**",
     };
 
     private final CustomJwtDecoder customJwtDecoder;
@@ -72,11 +71,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_POST)
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, PUBLIC_GET)
-                .permitAll()
-                .anyRequest()
-                .authenticated());
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GET)
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)

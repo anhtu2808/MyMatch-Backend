@@ -1,11 +1,10 @@
 package com.mymatch.service;
 
-import com.mymatch.dto.response.filemanager.FileDownloadResponse;
-import com.mymatch.enums.StorageType;
-import org.springframework.core.io.Resource;
+import java.io.InputStream;
+
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import com.mymatch.enums.StorageType;
 
 public interface FileManagerService {
     /**
@@ -28,12 +27,12 @@ public interface FileManagerService {
      * @param type             Loại lưu trữ (PUBLIC hoặc PRIVATE).
      * @return Đường dẫn hoặc URL của file đã lưu.
      */
-    String saveStream(InputStream inputStream,
-                      String originalFilename,
-                      String contentType,
-                      String subDirectory,
-                      StorageType type);
-
+    String saveStream(
+            InputStream inputStream,
+            String originalFilename,
+            String contentType,
+            String subDirectory,
+            StorageType type);
 
     /**
      * Xóa một file khỏi thư mục con.
@@ -45,8 +44,4 @@ public interface FileManagerService {
     void delete(String filename, String subDirectory, StorageType type);
 
     String buildFilePath(Long userId, String uuid);
-
-
-
-
 }

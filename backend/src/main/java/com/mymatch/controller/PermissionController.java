@@ -1,16 +1,18 @@
 package com.mymatch.controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.role.PermissionRequest;
 import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.role.PermissionResponse;
 import com.mymatch.service.PermissionService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/permissions")

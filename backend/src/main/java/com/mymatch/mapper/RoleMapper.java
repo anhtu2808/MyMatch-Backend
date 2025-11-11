@@ -1,16 +1,17 @@
 package com.mymatch.mapper;
 
-import com.mymatch.dto.request.role.RoleCreationRequest;
-import com.mymatch.dto.request.role.RoleUpdateRequest;
-import com.mymatch.dto.response.role.RoleResponse;
-import com.mymatch.entity.Permission;
-import com.mymatch.entity.Role;
+import java.util.Set;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import java.util.Set;
+import com.mymatch.dto.request.role.RoleCreationRequest;
+import com.mymatch.dto.request.role.RoleUpdateRequest;
+import com.mymatch.dto.response.role.RoleResponse;
+import com.mymatch.entity.Permission;
+import com.mymatch.entity.Role;
 
 @Mapper(
         componentModel = "spring",

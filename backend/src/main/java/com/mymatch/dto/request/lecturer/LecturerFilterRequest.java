@@ -11,6 +11,6 @@ import lombok.experimental.FieldDefaults;
 public class LecturerFilterRequest {
     Long campusId;
     Boolean isReviewed = false;
-    String name;   // search contain
-    String code;   // search contain
+    String name; // search contain
+    String code; // search contain
 }

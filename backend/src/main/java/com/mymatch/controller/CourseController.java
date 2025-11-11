@@ -1,5 +1,10 @@
 package com.mymatch.controller;
 
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import com.mymatch.dto.request.course.CourseCreationRequest;
 import com.mymatch.dto.request.course.CourseFilterRequest;
 import com.mymatch.dto.request.course.CourseUpdateRequest;
@@ -7,12 +12,10 @@ import com.mymatch.dto.response.ApiResponse;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.course.CourseResponse;
 import com.mymatch.service.CourseService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/courses")
@@ -42,7 +45,8 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<CourseResponse> updateCourse(@PathVariable Long id, @RequestBody @Valid CourseUpdateRequest req) {
+    public ApiResponse<CourseResponse> updateCourse(
+            @PathVariable Long id, @RequestBody @Valid CourseUpdateRequest req) {
         return ApiResponse.<CourseResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Cập nhật môn học thành công")
