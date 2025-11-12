@@ -171,13 +171,22 @@ public class StudentRequestServiceImpl implements StudentRequestService {
         User currentUser = userRepository
                 .findById(SecurityUtil.getCurrentUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        if (currentUser.getStudent() == null) throw new AppException(ErrorCode.STUDENT_INFO_REQUIRED);
 
         StudentRequest sr =
                 studentRequestRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_FOUND));
 
-        if (!sr.getStudent().getId().equals(currentUser.getStudent().getId())
-                && !SecurityUtil.hasAuthority("student_request:delete")) {
+        // Nếu có quyền admin/moderator thì cho phép xóa luôn
+        if (SecurityUtil.hasAuthority("student_request:delete")) {
+            studentRequestRepository.delete(sr);
+            return;
+        }
+
+        // Nếu không có quyền đặc biệt, phải là chủ sở hữu
+        if (currentUser.getStudent() == null) {
+            throw new AppException(ErrorCode.STUDENT_INFO_REQUIRED);
+        }
+
+        if (!sr.getStudent().getId().equals(currentUser.getStudent().getId())) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
         }
 

@@ -202,9 +202,11 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    @Transactional
     public void deleteTeam(Long id) {
         Team team = teamRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
         checkOwnerOrAdmin(team, "team:delete");
+        team.getRequests().forEach(tr -> tr.setStatus(com.mymatch.enums.RequestStatus.CLOSED));
         teamRepository.delete(team);
     }
 
