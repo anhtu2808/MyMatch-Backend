@@ -19,6 +19,8 @@ import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.dashboard.*;
 import com.mymatch.entity.*;
 import com.mymatch.enums.*;
+import com.mymatch.enums.TransactionSource;
+import com.mymatch.enums.TransactionStatus;
 import com.mymatch.repository.*;
 import com.mymatch.service.DashboardService;
 import com.mymatch.specification.DashboardSpecification;
@@ -36,7 +38,6 @@ public class DashboardServiceImpl implements DashboardService {
     StudentRepository studentRepository;
     SwapRepository swapRepository;
     TransactionRepository transactionRepository;
-    PaymentRepository paymentRepository;
     StudentRequestRepository studentRequestRepository;
     TeamRequestRepository teamRequestRepository;
     UniversityRepository universityRepository;
@@ -47,17 +48,18 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardKpiResponse getKpis(DashboardFilterRequest filter) {
         Specification<User> userSpec = DashboardSpecification.userFilter(filter);
         Specification<Student> studentSpec = DashboardSpecification.studentFilter(filter);
-        Specification<Payment> paymentSpec = DashboardSpecification.paymentFilter(filter);
         Specification<Swap> swapSpec = DashboardSpecification.swapFilter(filter);
 
         // Total users
         long totalUsers = userRepository.count(userSpec);
 
-        // Revenue - sum of completed payments
-        Specification<Payment> completedPaymentSpec =
-                paymentSpec.and((root, query, cb) -> cb.equal(root.get("status"), PaymentStatus.PAID));
-        double revenue = paymentRepository.findAll(completedPaymentSpec).stream()
-                .mapToDouble(p -> p.getAmountVnd() != null ? p.getAmountVnd() : 0.0)
+        // Revenue - sum of completed TOP_UP transactions
+        Specification<Transaction> revenueSpec = DashboardSpecification.transactionFilter(filter);
+        Specification<Transaction> topUpCompletedSpec = revenueSpec.and((root, query, cb) -> cb.and(
+                cb.equal(root.get("source"), TransactionSource.TOP_UP),
+                cb.equal(root.get("status"), TransactionStatus.COMPLETED)));
+        double revenue = transactionRepository.findAll(topUpCompletedSpec).stream()
+                .mapToDouble(t -> t.getAmount() != null ? t.getAmount() : 0.0)
                 .sum();
 
         // Active students - students with active users
@@ -140,27 +142,28 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public List<RevenueTrendData> getRevenueTrend(ChartFilterRequest filter) {
-        Specification<Payment> baseSpec = DashboardSpecification.paymentFilter(filter);
-        Specification<Payment> completedSpec =
-                baseSpec.and((root, query, cb) -> cb.equal(root.get("status"), PaymentStatus.PAID));
+        Specification<Transaction> baseSpec = DashboardSpecification.transactionFilter(filter);
+        Specification<Transaction> topUpCompletedSpec = baseSpec.and((root, query, cb) -> cb.and(
+                cb.equal(root.get("source"), TransactionSource.TOP_UP),
+                cb.equal(root.get("status"), TransactionStatus.COMPLETED)));
 
-        List<Payment> payments = paymentRepository.findAll(completedSpec);
+        List<Transaction> transactions = transactionRepository.findAll(topUpCompletedSpec);
 
-        if (payments.isEmpty()) {
+        if (transactions.isEmpty()) {
             return new ArrayList<>();
         }
 
         LocalDateTime startDate = filter.getStartDate() != null
                 ? filter.getStartDate()
-                : payments.stream()
-                        .map(Payment::getCreateAt)
+                : transactions.stream()
+                        .map(Transaction::getCreateAt)
                         .min(LocalDateTime::compareTo)
                         .orElse(LocalDateTime.now());
         LocalDateTime endDate = filter.getEndDate() != null ? filter.getEndDate() : LocalDateTime.now();
 
         DateGroupBy groupBy = filter.getGroupBy() != null ? filter.getGroupBy() : DateGroupBy.DAY;
 
-        return groupPaymentsByDate(payments, startDate, endDate, groupBy);
+        return groupTransactionsByDate(transactions, startDate, endDate, groupBy);
     }
 
     @Override
@@ -381,8 +384,8 @@ public class DashboardServiceImpl implements DashboardService {
 
     // Helper methods
 
-    private List<RevenueTrendData> groupPaymentsByDate(
-            List<Payment> payments, LocalDateTime startDate, LocalDateTime endDate, DateGroupBy groupBy) {
+    private List<RevenueTrendData> groupTransactionsByDate(
+            List<Transaction> transactions, LocalDateTime startDate, LocalDateTime endDate, DateGroupBy groupBy) {
         List<RevenueTrendData> result = new ArrayList<>();
         LocalDate current = startDate.toLocalDate();
         LocalDate end = endDate.toLocalDate();
@@ -391,12 +394,12 @@ public class DashboardServiceImpl implements DashboardService {
             LocalDateTime periodStart = current.atStartOfDay();
             LocalDateTime periodEnd = getPeriodEnd(current, groupBy);
 
-            double revenue = payments.stream()
-                    .filter(p -> {
-                        LocalDateTime createAt = p.getCreateAt();
+            double revenue = transactions.stream()
+                    .filter(t -> {
+                        LocalDateTime createAt = t.getCreateAt();
                         return createAt != null && !createAt.isBefore(periodStart) && createAt.isBefore(periodEnd);
                     })
-                    .mapToDouble(p -> p.getAmountVnd() != null ? p.getAmountVnd() : 0.0)
+                    .mapToDouble(t -> t.getAmount() != null ? t.getAmount() : 0.0)
                     .sum();
 
             result.add(RevenueTrendData.builder()
