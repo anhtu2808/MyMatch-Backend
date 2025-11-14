@@ -2,9 +2,15 @@ package com.mymatch.service.impl;
 
 import static com.mymatch.utils.SecurityUtil.hasAuthority;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mymatch.dto.request.user.UserCreationRequest;
+import com.mymatch.dto.request.user.UserFilterRequest;
 import com.mymatch.dto.request.user.UserUpdateRequest;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.user.UserResponse;
@@ -25,6 +32,7 @@ import com.mymatch.mapper.UserMapper;
 import com.mymatch.repository.*;
 import com.mymatch.service.StudentService;
 import com.mymatch.service.UserService;
+import com.mymatch.specification.UserSpecification;
 import com.mymatch.utils.SecurityUtil;
 import com.mymatch.utils.WalletCodeUtil;
 
@@ -107,7 +115,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void unBanUser(Long userId) {}
+    @Transactional
+    public UserResponse banUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setIsActive(false);
+        user = userRepository.save(user);
+        log.info("Banned user id={}, username={}", userId, user.getUsername());
+        return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public void unBanUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setIsActive(true);
+        userRepository.save(user);
+        log.info("Unbanned user id={}, username={}", userId, user.getUsername());
+    }
 
     @Override
     public UserResponse getUser(Long id) {
@@ -139,7 +163,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResponse<UserResponse> getAllUsers(int page, int size, String sort, String filter, String searchTerm) {
-        return null;
+    @Transactional(readOnly = true)
+    public PageResponse<UserResponse> getAllUsers(UserFilterRequest filterRequest) {
+        Specification<User> spec = UserSpecification.withFilter(filterRequest);
+
+        String sortBy =
+                (filterRequest.getSort() == null || filterRequest.getSort().isBlank()) ? "id" : filterRequest.getSort();
+        Sort.Direction direction = Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+
+        int page = Math.max(filterRequest.getPage() - 1, 0);
+        int size = Math.min(Math.max(filterRequest.getSize(), 1), 200);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<User> pages = userRepository.findAll(spec, pageable);
+
+        List<UserResponse> data = pages.getContent().stream()
+                .map(user -> {
+                    UserResponse response = userMapper.toUserResponse(user);
+                    Set<String> permissions = user.getRole().getPermissions().stream()
+                            .map(Permission::getName)
+                            .collect(Collectors.toSet());
+                    response.setPermissions(permissions);
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return PageResponse.<UserResponse>builder()
+                .data(data)
+                .pageSize(pages.getSize())
+                .totalPages(pages.getTotalPages())
+                .totalElements(pages.getTotalElements())
+                .currentPage(filterRequest.getPage())
+                .build();
     }
 }
