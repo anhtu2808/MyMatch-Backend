@@ -49,7 +49,7 @@ public class StudentController {
     }
 
     @GetMapping
-    public ApiResponse<PageResponse<StudentResponse>> getAllStudents(@RequestBody StudentFilterRequest req) {
+    public ApiResponse<PageResponse<StudentResponse>> getAllStudents(@ModelAttribute StudentFilterRequest req) {
         return ApiResponse.<PageResponse<StudentResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Lấy danh sách sinh viên thành công")

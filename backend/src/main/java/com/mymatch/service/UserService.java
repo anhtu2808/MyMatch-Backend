@@ -3,6 +3,7 @@ package com.mymatch.service;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.mymatch.dto.request.user.UserCreationRequest;
+import com.mymatch.dto.request.user.UserFilterRequest;
 import com.mymatch.dto.request.user.UserUpdateRequest;
 import com.mymatch.dto.response.PageResponse;
 import com.mymatch.dto.response.user.UserResponse;
@@ -15,13 +16,17 @@ public interface UserService {
 
     public UserResponse deleteUser(Long id);
 
+    @PreAuthorize("hasAuthority('user:update')")
+    public UserResponse banUser(Long userId);
+
+    @PreAuthorize("hasAuthority('user:update')")
     public void unBanUser(Long userId);
 
-    @PreAuthorize("hasAnyAuthority('user:read')")
+    @PreAuthorize("hasAuthority('user:read')")
     public UserResponse getUser(Long id);
 
     public UserResponse getMyInfo();
 
-    @PreAuthorize("hasAnyAuthority('user:read')")
-    public PageResponse<UserResponse> getAllUsers(int page, int size, String sort, String filter, String searchTerm);
+    @PreAuthorize("hasAuthority('user:read')")
+    public PageResponse<UserResponse> getAllUsers(UserFilterRequest filterRequest);
 }

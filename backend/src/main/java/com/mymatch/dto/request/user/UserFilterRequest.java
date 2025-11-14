@@ -11,12 +11,19 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserFilterRequest {
-    int page;
-    int size;
+    @Builder.Default
+    int page = 1;
+
+    @Builder.Default
+    int size = 10;
+
     String sort;
     RoleType role;
     Integer deleted;
+    Boolean isActive;
     String username;
     String email;
     String search;
+    Long universityId;
+    Long campusId;
 }
