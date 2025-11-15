@@ -26,6 +26,7 @@ public class UserResponse {
     String role;
     Set<String> permissions;
     int deleted;
+    Boolean isActive;
     StudentResponse student;
     WalletResponse wallet;
     LecturerResponse lecturer;
